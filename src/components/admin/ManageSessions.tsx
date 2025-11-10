@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings } from "lucide-react";
+import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const AVATARS = [
   { id: "professional-male", name: "Professional Male", description: "Formal business attire" },
@@ -49,6 +50,8 @@ const ManageSessions = () => {
   ]);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [videoQuality, setVideoQuality] = useState("720p");
   const [instructorConfig, setInstructorConfig] = useState<InstructorConfig>({
     avatar: "",
     voice: "",
@@ -98,6 +101,22 @@ const ManageSessions = () => {
     toast({
       title: "Session Created",
       description: `Virtual instructor session for ${instructorConfig.courseName} has been created`,
+    });
+  };
+
+  const handleExportVideo = () => {
+    // Simulate video export
+    const link = document.createElement('a');
+    link.href = 'https://www.w3schools.com/html/mov_bbb.mp4'; // Dummy video
+    link.download = `instructor-session-${videoQuality}.mp4`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setIsExportDialogOpen(false);
+    toast({
+      title: "Export Started",
+      description: `Exporting video in ${videoQuality} quality`,
     });
   };
 
@@ -265,9 +284,47 @@ const ManageSessions = () => {
                 </div>
               </div>
 
-              <Button onClick={handleCreateSession} className="w-full">
-                Create Virtual Instructor Session
-              </Button>
+              <div className="grid grid-cols-2 gap-4">
+                <Button onClick={handleCreateSession} className="w-full">
+                  Create Virtual Instructor Session
+                </Button>
+                <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full gap-2">
+                      <Download className="h-4 w-4" />
+                      Export Video
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Export Video</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <p className="text-sm text-muted-foreground">
+                        Choose video quality to export
+                      </p>
+                      <RadioGroup value={videoQuality} onValueChange={setVideoQuality}>
+                        <div className="flex items-center space-x-2 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="480p" id="480p" />
+                          <Label htmlFor="480p" className="flex-1 cursor-pointer">480p (SD)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="720p" id="720p" />
+                          <Label htmlFor="720p" className="flex-1 cursor-pointer">720p (HD)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value="1080p" id="1080p" />
+                          <Label htmlFor="1080p" className="flex-1 cursor-pointer">1080p (Full HD)</Label>
+                        </div>
+                      </RadioGroup>
+                      <Button onClick={handleExportVideo} className="w-full gap-2">
+                        <Download className="h-4 w-4" />
+                        Download
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
