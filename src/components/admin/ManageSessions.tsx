@@ -6,18 +6,61 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download, Briefcase, UserSquare, Smile, FlaskConical, GraduationCap, Scale, Radio, BookOpen, Sparkles, Zap } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download, Briefcase, UserSquare, Smile, FlaskConical, GraduationCap, Scale, Radio, BookOpen, Sparkles, Zap, Shirt, Heart, Beaker } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import professionalMaleImage from "@/assets/professional_male.jpg";
+import professionalFemaleImage from "@/assets/professional_female.jpg";
+import casualMaleImage from "@/assets/casual_male.jpg";
+import casualFemaleImage from "@/assets/casual_female.jpg";
+import scientistImage from "@/assets/scientist.jpg";
+import teacherImage from "@/assets/teacher.jpg";
 
 const AVATARS = [
-  { id: "professional-male", name: "Professional Male", description: "Formal business attire", icon: Briefcase },
-  { id: "professional-female", name: "Professional Female", description: "Formal business attire", icon: UserSquare },
-  { id: "casual-male", name: "Casual Male", description: "Friendly and approachable", icon: Smile },
-  { id: "casual-female", name: "Casual Female", description: "Friendly and approachable", icon: User },
-  { id: "scientist", name: "Scientist", description: "Lab coat and glasses", icon: FlaskConical },
-  { id: "teacher", name: "Teacher", description: "Academic setting", icon: GraduationCap },
+  { 
+    id: "professional-male", 
+    name: "Professional Male", 
+    description: "Formal business attire", 
+    icon: Briefcase,
+    imageUrl: professionalMaleImage
+  },
+  { 
+    id: "professional-female", 
+    name: "Professional Female", 
+    description: "Formal business attire", 
+    icon: Shirt,
+    imageUrl: professionalFemaleImage
+  },
+  { 
+    id: "casual-male", 
+    name: "Casual Male", 
+    description: "Friendly and approachable", 
+    icon: Smile,
+    imageUrl: casualMaleImage
+  },
+  { 
+    id: "casual-female", 
+    name: "Casual Female", 
+    description: "Friendly and approachable", 
+    icon: Heart,
+    imageUrl: casualFemaleImage
+  },
+  { 
+    id: "scientist", 
+    name: "Scientist", 
+    description: "Lab coat and glasses", 
+    icon: Beaker,
+    imageUrl: scientistImage
+  },
+  { 
+    id: "teacher", 
+    name: "Teacher", 
+    description: "Academic setting", 
+    icon: BookOpen,
+    imageUrl: teacherImage
+  },
 ];
 
 const VOICES = [
@@ -153,16 +196,28 @@ const ManageSessions = () => {
                       <button
                         key={avatar.id}
                         onClick={() => setInstructorConfig({ ...instructorConfig, avatar: avatar.id })}
-                        className={`p-4 border-2 rounded-lg text-left transition-all ${
+                        className={`p-4 border-2 rounded-lg text-left transition-all relative ${
                           instructorConfig.avatar === avatar.id
                             ? "border-primary bg-secondary"
                             : "border-border hover:border-primary/50"
                         }`}
                       >
-                        <div className="flex flex-col items-center gap-2 mb-2">
-                          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                            <IconComponent className="h-8 w-8 text-primary" />
-                          </div>
+                        {/* Icon Badge */}
+                        <div className="absolute top-2 right-2 p-1.5 rounded-full bg-primary/10 border border-primary/20">
+                          <IconComponent className="h-4 w-4 text-primary" />
+                        </div>
+                        
+                        <div className="flex flex-col items-center gap-2 mb-2 pt-1">
+                          <Avatar className="w-20 h-20 border-2 border-border">
+                            <AvatarImage 
+                              src={avatar.imageUrl} 
+                              alt={avatar.name}
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="bg-primary/10">
+                              <IconComponent className="h-8 w-8 text-primary" />
+                            </AvatarFallback>
+                          </Avatar>
                         </div>
                         <div className="font-semibold text-foreground text-center">{avatar.name}</div>
                         <div className="text-sm text-muted-foreground text-center">{avatar.description}</div>
