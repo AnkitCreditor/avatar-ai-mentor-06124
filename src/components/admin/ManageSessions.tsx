@@ -157,8 +157,13 @@ const ManageSessions = () => {
                           : "border-border hover:border-primary/50"
                       }`}
                     >
-                      <div className="font-semibold text-foreground">{avatar.name}</div>
-                      <div className="text-sm text-muted-foreground">{avatar.description}</div>
+                      <div className="flex flex-col items-center gap-2 mb-2">
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="h-8 w-8 text-primary" />
+                        </div>
+                      </div>
+                      <div className="font-semibold text-foreground text-center">{avatar.name}</div>
+                      <div className="text-sm text-muted-foreground text-center">{avatar.description}</div>
                     </button>
                   ))}
                 </div>
@@ -181,7 +186,12 @@ const ManageSessions = () => {
                           : "border-border hover:border-primary/50"
                       }`}
                     >
-                      <div className="font-semibold text-foreground">{voice.name}</div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Volume2 className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="font-semibold text-foreground">{voice.name}</div>
+                      </div>
                       <div className="text-sm text-muted-foreground">{voice.description}</div>
                     </button>
                   ))}
