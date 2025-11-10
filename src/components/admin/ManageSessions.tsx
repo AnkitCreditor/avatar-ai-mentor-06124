@@ -6,27 +6,27 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download } from "lucide-react";
+import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download, Briefcase, UserSquare, Smile, FlaskConical, GraduationCap, Scale, Radio, BookOpen, Sparkles, Zap } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const AVATARS = [
-  { id: "professional-male", name: "Professional Male", description: "Formal business attire" },
-  { id: "professional-female", name: "Professional Female", description: "Formal business attire" },
-  { id: "casual-male", name: "Casual Male", description: "Friendly and approachable" },
-  { id: "casual-female", name: "Casual Female", description: "Friendly and approachable" },
-  { id: "scientist", name: "Scientist", description: "Lab coat and glasses" },
-  { id: "teacher", name: "Teacher", description: "Academic setting" },
+  { id: "professional-male", name: "Professional Male", description: "Formal business attire", icon: Briefcase },
+  { id: "professional-female", name: "Professional Female", description: "Formal business attire", icon: UserSquare },
+  { id: "casual-male", name: "Casual Male", description: "Friendly and approachable", icon: Smile },
+  { id: "casual-female", name: "Casual Female", description: "Friendly and approachable", icon: User },
+  { id: "scientist", name: "Scientist", description: "Lab coat and glasses", icon: FlaskConical },
+  { id: "teacher", name: "Teacher", description: "Academic setting", icon: GraduationCap },
 ];
 
 const VOICES = [
-  { id: "alloy", name: "Alloy", description: "Neutral and balanced" },
-  { id: "echo", name: "Echo", description: "Clear and articulate" },
-  { id: "fable", name: "Fable", description: "Warm and engaging" },
-  { id: "onyx", name: "Onyx", description: "Deep and authoritative" },
-  { id: "nova", name: "Nova", description: "Energetic and friendly" },
-  { id: "shimmer", name: "Shimmer", description: "Soft and calm" },
+  { id: "alloy", name: "Alloy", description: "Neutral and balanced", icon: Scale },
+  { id: "echo", name: "Echo", description: "Clear and articulate", icon: Radio },
+  { id: "fable", name: "Fable", description: "Warm and engaging", icon: BookOpen },
+  { id: "onyx", name: "Onyx", description: "Deep and authoritative", icon: Volume2 },
+  { id: "nova", name: "Nova", description: "Energetic and friendly", icon: Zap },
+  { id: "shimmer", name: "Shimmer", description: "Soft and calm", icon: Sparkles },
 ];
 
 interface InstructorConfig {
@@ -147,25 +147,28 @@ const ManageSessions = () => {
                   <Label className="text-lg font-semibold">Choose Avatar Character</Label>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
-                  {AVATARS.map((avatar) => (
-                    <button
-                      key={avatar.id}
-                      onClick={() => setInstructorConfig({ ...instructorConfig, avatar: avatar.id })}
-                      className={`p-4 border-2 rounded-lg text-left transition-all ${
-                        instructorConfig.avatar === avatar.id
-                          ? "border-primary bg-secondary"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center gap-2 mb-2">
-                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                          <User className="h-8 w-8 text-primary" />
+                  {AVATARS.map((avatar) => {
+                    const IconComponent = avatar.icon;
+                    return (
+                      <button
+                        key={avatar.id}
+                        onClick={() => setInstructorConfig({ ...instructorConfig, avatar: avatar.id })}
+                        className={`p-4 border-2 rounded-lg text-left transition-all ${
+                          instructorConfig.avatar === avatar.id
+                            ? "border-primary bg-secondary"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        <div className="flex flex-col items-center gap-2 mb-2">
+                          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                            <IconComponent className="h-8 w-8 text-primary" />
+                          </div>
                         </div>
-                      </div>
-                      <div className="font-semibold text-foreground text-center">{avatar.name}</div>
-                      <div className="text-sm text-muted-foreground text-center">{avatar.description}</div>
-                    </button>
-                  ))}
+                        <div className="font-semibold text-foreground text-center">{avatar.name}</div>
+                        <div className="text-sm text-muted-foreground text-center">{avatar.description}</div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -176,25 +179,28 @@ const ManageSessions = () => {
                   <Label className="text-lg font-semibold">Voice Configuration</Label>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {VOICES.map((voice) => (
-                    <button
-                      key={voice.id}
-                      onClick={() => setInstructorConfig({ ...instructorConfig, voice: voice.id })}
-                      className={`p-4 border-2 rounded-lg text-left transition-all ${
-                        instructorConfig.voice === voice.id
-                          ? "border-primary bg-secondary"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Volume2 className="h-5 w-5 text-primary" />
+                  {VOICES.map((voice) => {
+                    const IconComponent = voice.icon;
+                    return (
+                      <button
+                        key={voice.id}
+                        onClick={() => setInstructorConfig({ ...instructorConfig, voice: voice.id })}
+                        className={`p-4 border-2 rounded-lg text-left transition-all ${
+                          instructorConfig.voice === voice.id
+                            ? "border-primary bg-secondary"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <IconComponent className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="font-semibold text-foreground">{voice.name}</div>
                         </div>
-                        <div className="font-semibold text-foreground">{voice.name}</div>
-                      </div>
-                      <div className="text-sm text-muted-foreground">{voice.description}</div>
-                    </button>
-                  ))}
+                        <div className="text-sm text-muted-foreground">{voice.description}</div>
+                      </button>
+                    );
+                  })}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 pt-2">
