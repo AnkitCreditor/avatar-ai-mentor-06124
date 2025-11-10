@@ -21,27 +21,6 @@ const Index = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>AI Instructor Demo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                    <video 
-                      controls 
-                      className="w-full h-full object-cover"
-                      poster="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=450&fit=crop"
-                    >
-                      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-4">
-                    Watch a demo of our AI-powered virtual instructor in action
-                  </p>
-                </CardContent>
-              </Card>
-              
               <VirtualInstructorSession />
               <SessionInfo />
             </div>
