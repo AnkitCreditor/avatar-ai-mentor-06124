@@ -41,16 +41,14 @@ const VirtualInstructorSession = () => {
             </div>
           </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                <Video className="h-12 w-12 text-primary" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold text-foreground">Session Ready</h3>
-                <p className="text-muted-foreground">Click "Start Session" to begin your virtual instructor session</p>
-              </div>
-            </div>
+          <div className="w-full h-full">
+            <video 
+              controls 
+              className="w-full h-full object-cover"
+              src="https://lesson-banners.s3.us-east-1.amazonaws.com/Scorms/3a98d3a3-efc5-461d-9b60-7a1febc71947.mp4"
+            >
+              Your browser does not support the video tag.
+            </video>
           </div>
         )}
 
