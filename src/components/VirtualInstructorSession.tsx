@@ -14,41 +14,27 @@ const VirtualInstructorSession = () => {
       {/* Video Area */}
       <Card className="relative aspect-video bg-gradient-to-br from-primary/5 to-background border-2 overflow-hidden">
         {isSessionActive ? (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
-            <div className="text-center space-y-4 animate-fade-in">
-              <img 
-                src={avatarIcon} 
-                alt="Virtual Instructor" 
-                className="w-48 h-48 mx-auto object-contain drop-shadow-2xl animate-float"
-              />
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-foreground">Dr. Sarah Mitchell</h3>
-                <p className="text-muted-foreground">Virtual Instructor - Computer Science</p>
-              </div>
-              {/* Audio Wave Animation */}
-              <div className="flex items-center justify-center gap-1 h-12">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-1 bg-primary rounded-full animate-pulse"
-                    style={{
-                      height: `${Math.random() * 40 + 20}px`,
-                      animationDelay: `${i * 0.1}s`,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
           <div className="w-full h-full">
             <video 
+              autoPlay
               controls 
               className="w-full h-full object-cover"
               src="https://lesson-banners.s3.us-east-1.amazonaws.com/Scorms/3a98d3a3-efc5-461d-9b60-7a1febc71947.mp4"
             >
               Your browser does not support the video tag.
             </video>
+          </div>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                <Video className="h-12 w-12 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-foreground">Session Ready</h3>
+                <p className="text-muted-foreground">Click "Start Session" to begin your virtual instructor session</p>
+              </div>
+            </div>
           </div>
         )}
 
