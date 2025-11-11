@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download, Briefcase, UserSquare, Smile, FlaskConical, GraduationCap, Scale, Radio, BookOpen, Sparkles, Zap, Shirt, Heart, Beaker, Copy, Share2 } from "lucide-react";
+import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download, Briefcase, UserSquare, Smile, FlaskConical, GraduationCap, Scale, Radio, BookOpen, Sparkles, Zap, Shirt, Heart, Beaker, Copy, Share2, Image as ImageIcon, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -17,6 +17,13 @@ import casualMaleImage from "@/assets/casual_male.jpg";
 import casualFemaleImage from "@/assets/casual_female.jpg";
 import scientistImage from "@/assets/scientist.jpg";
 import teacherImage from "@/assets/teacher.jpg";
+import heroBackground from "@/assets/hero-instructor.jpg";
+import classroomBackground from "@/assets/classroom.jpg";
+import computerLabBackground from "@/assets/computer_lab.jpg";
+import conferenceRoomBackground from "@/assets/conference_hall.jpg";
+import lectureHallBackground from "@/assets/lecture_hall.jpg";
+import manufacturingFloorBackground from "@/assets/manufacturing_floor.jpg";
+import libraryBackground from "@/assets/library.jpg";
 import { buildShareLink, generateMeetingId, loadSessions, saveSessions, SessionRecord } from "@/lib/sessionStorage";
 
 const AVATARS = [
@@ -83,6 +90,7 @@ interface InstructorConfig {
   content: string;
   systemPrompt: string;
   language: string;
+  background: string;
 }
 
 const ManageSessions = () => {
@@ -102,6 +110,7 @@ const ManageSessions = () => {
     content: "",
     systemPrompt: "You are a knowledgeable and patient AI instructor. Help students understand the material through clear explanations and examples.",
     language: "en",
+    background: classroomBackground,
   });
 
   useEffect(() => {
@@ -211,6 +220,7 @@ const ManageSessions = () => {
       content: "",
       systemPrompt: "You are a knowledgeable and patient AI instructor. Help students understand the material through clear explanations and examples.",
       language: "en",
+      background: classroomBackground,
     });
 
     const copied = await copySessionLink(shareLink, { silent: true });
@@ -301,6 +311,102 @@ const ManageSessions = () => {
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Background Selection */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5 text-primary" />
+                  <Label className="text-lg font-semibold">Background</Label>
+                </div>
+                {/*
+                  Demo preset backgrounds: feel free to expand with more images later.
+                  We'll include a few options plus upload.
+                */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { id: "bg-classroom", name: "Classroom (Default)", url: classroomBackground },
+                    { id: "bg-lecture-hall", name: "Lecture Hall", url: lectureHallBackground },
+                    { id: "bg-computer-lab", name: "Computer Lab", url: computerLabBackground },
+                    { id: "bg-conference-room", name: "Conference Room", url: conferenceRoomBackground },
+                    { id: "bg-library", name: "Library", url: libraryBackground },
+                    { id: "bg-manufacturing", name: "Manufacturing Floor", url: manufacturingFloorBackground },
+                    { id: "bg-gradient-1", name: "Purple Gradient", url: "data:gradient/purple" },
+                    { id: "bg-gradient-2", name: "Blue Gradient", url: "data:gradient/blue" },
+                    { id: "bg-lab", name: "Science Lab", url: heroBackground },
+                  ].map((bg) => (
+                    <button
+                      key={bg.id}
+                      onClick={() => setInstructorConfig({ ...instructorConfig, background: bg.url })}
+                      className={`p-2 border-2 rounded-lg transition-all ${
+                        instructorConfig.background === bg.url
+                          ? "border-primary bg-secondary"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                      title={bg.name}
+                    >
+                      <div className="aspect-video w-full overflow-hidden rounded-md border border-border">
+                        {bg.url.startsWith("data:gradient/") ? (
+                          <div
+                            className={`h-full w-full ${
+                              bg.url.endsWith("purple")
+                                ? "bg-gradient-to-br from-fuchsia-500/40 via-purple-500/30 to-indigo-500/40"
+                                : "bg-gradient-to-br from-sky-500/40 via-cyan-500/30 to-blue-500/40"
+                            }`}
+                          />
+                        ) : (
+                          <img src={bg.url} alt={bg.name} className="h-full w-full object-cover" />
+                        )}
+                      </div>
+                      <div className="mt-2 text-center text-sm text-foreground">{bg.name}</div>
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <label
+                    className="col-span-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-4 text-sm hover:border-primary/50"
+                  >
+                    <Upload className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Upload custom background image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const dataUrl = typeof reader.result === "string" ? reader.result : "";
+                          setInstructorConfig({ ...instructorConfig, background: dataUrl });
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                  </label>
+                </div>
+                {instructorConfig.background ? (
+                  <div className="rounded-lg border border-border p-3">
+                    <div className="mb-2 text-sm font-medium text-foreground">Selected background preview</div>
+                    <div className="aspect-video w-full overflow-hidden rounded-md border border-border">
+                      {instructorConfig.background.startsWith("data:gradient/") ? (
+                        <div
+                          className={`h-full w-full ${
+                            instructorConfig.background.endsWith("purple")
+                              ? "bg-gradient-to-br from-fuchsia-500/40 via-purple-500/30 to-indigo-500/40"
+                              : "bg-gradient-to-br from-sky-500/40 via-cyan-500/30 to-blue-500/40"
+                          }`}
+                        />
+                      ) : (
+                        <img
+                          src={instructorConfig.background}
+                          alt="Selected background"
+                          className="h-full w-full object-cover"
+                        />
+                      )}
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               {/* Voice Selection */}
