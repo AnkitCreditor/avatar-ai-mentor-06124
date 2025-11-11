@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download, Briefcase, UserSquare, Smile, FlaskConical, GraduationCap, Scale, Radio, BookOpen, Sparkles, Zap, Shirt, Heart, Beaker } from "lucide-react";
-import { useState } from "react";
+import { Plus, Play, Pause, Trash2, Edit, User, Mic, Volume2, FileText, Settings, Download, Briefcase, UserSquare, Smile, FlaskConical, GraduationCap, Scale, Radio, BookOpen, Sparkles, Zap, Shirt, Heart, Beaker, Copy, Share2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import professionalMaleImage from "@/assets/professional_male.jpg";
@@ -17,6 +17,7 @@ import casualMaleImage from "@/assets/casual_male.jpg";
 import casualFemaleImage from "@/assets/casual_female.jpg";
 import scientistImage from "@/assets/scientist.jpg";
 import teacherImage from "@/assets/teacher.jpg";
+import { buildShareLink, generateMeetingId, loadSessions, saveSessions, SessionRecord } from "@/lib/sessionStorage";
 
 const AVATARS = [
   { 
@@ -86,12 +87,8 @@ interface InstructorConfig {
 
 const ManageSessions = () => {
   const { toast } = useToast();
-  const [sessions, setSessions] = useState([
-    { id: 1, course: "Advanced Mathematics", instructor: "AI Instructor", status: "Active", students: 24, duration: "1h 20m", config: null },
-    { id: 2, course: "Physics 101", instructor: "AI Instructor", status: "Scheduled", students: 18, duration: "Not started", config: null },
-    { id: 3, course: "Chemistry Basics", instructor: "AI Instructor", status: "Completed", students: 32, duration: "1h 45m", config: null },
-  ]);
-  
+  const [sessions, setSessions] = useState<SessionRecord[]>(() => loadSessions());
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [videoQuality, setVideoQuality] = useState("720p");
@@ -107,7 +104,75 @@ const ManageSessions = () => {
     language: "en",
   });
 
-  const handleCreateSession = () => {
+  useEffect(() => {
+    const refreshSessions = () => {
+      setSessions(loadSessions());
+    };
+
+    window.addEventListener("virtual-instructor:sessions-updated", refreshSessions);
+    window.addEventListener("storage", refreshSessions);
+
+    return () => {
+      window.removeEventListener("virtual-instructor:sessions-updated", refreshSessions);
+      window.removeEventListener("storage", refreshSessions);
+    };
+  }, []);
+
+  const copySessionLink = async (link: string, { silent = false }: { silent?: boolean } = {}) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(link);
+        if (!silent) {
+          toast({
+            title: "Session link copied",
+            description: "Share this link with participants.",
+          });
+        }
+        return true;
+      }
+      throw new Error("Clipboard API unavailable");
+    } catch (error) {
+      console.error(error);
+      if (typeof window !== "undefined") {
+        window.prompt("Copy this session link:", link);
+      }
+
+      if (!silent) {
+        toast({
+          title: "Session link ready",
+          description: link,
+        });
+      }
+      return false;
+    }
+  };
+
+  const persistSessions = (nextSessions: SessionRecord[]) => {
+    setSessions(nextSessions);
+    saveSessions(nextSessions);
+  };
+
+  const updateSessionStatus = (sessionId: number, status: SessionRecord["status"]) => {
+    const updated = sessions.map((session) =>
+      session.id === sessionId ? { ...session, status } : session
+    );
+    persistSessions(updated);
+    toast({
+      title: "Session Updated",
+      description: `Session status changed to ${status}.`,
+    });
+  };
+
+  const removeSession = (sessionId: number) => {
+    const updated = sessions.filter((session) => session.id !== sessionId);
+    persistSessions(updated);
+    toast({
+      title: "Session Removed",
+      description: "The session has been removed from the schedule.",
+    });
+  };
+
+  const handleCreateSession = async () => {
     if (!instructorConfig.avatar || !instructorConfig.voice || !instructorConfig.courseName) {
       toast({
         title: "Missing Information",
@@ -117,17 +182,24 @@ const ManageSessions = () => {
       return;
     }
 
-    const newSession = {
-      id: sessions.length + 1,
+    const nextId = sessions.length > 0 ? Math.max(...sessions.map((session) => session.id)) + 1 : 1;
+    const meetingId = generateMeetingId();
+    const shareLink = buildShareLink(meetingId);
+
+    const newSession: SessionRecord = {
+      id: nextId,
       course: instructorConfig.courseName,
       instructor: `AI Instructor (${AVATARS.find(a => a.id === instructorConfig.avatar)?.name})`,
       status: "Scheduled",
       students: 0,
       duration: "Not started",
       config: { ...instructorConfig },
+      meetingId,
+      shareLink,
     };
 
-    setSessions([...sessions, newSession]);
+    const updatedSessions = [...sessions, newSession];
+    persistSessions(updatedSessions);
     setIsDialogOpen(false);
     setInstructorConfig({
       avatar: "",
@@ -141,9 +213,13 @@ const ManageSessions = () => {
       language: "en",
     });
 
+    const copied = await copySessionLink(shareLink, { silent: true });
+
     toast({
       title: "Session Created",
-      description: `Virtual instructor session for ${instructorConfig.courseName} has been created`,
+      description: copied
+        ? `Meeting ID ${meetingId} generated. Share link copied to your clipboard.`
+        : `Meeting ID ${meetingId} generated. Share link: ${shareLink}`,
     });
   };
 
@@ -419,6 +495,32 @@ const ManageSessions = () => {
                     <span>•</span>
                     <span>{session.duration}</span>
                   </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                    <span className="font-medium text-foreground">Meeting ID:</span>
+                    <span className="font-mono text-xs sm:text-sm">{session.meetingId}</span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={() => copySessionLink(session.shareLink)}
+                    >
+                      <Copy className="h-4 w-4" />
+                      Copy Link
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={() => {
+                        if (typeof window !== "undefined") {
+                          window.open(session.shareLink, "_blank", "noopener,noreferrer");
+                        }
+                      }}
+                    >
+                      <Share2 className="h-4 w-4" />
+                      Open Room
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Badge variant={session.status === "Active" ? "default" : session.status === "Scheduled" ? "secondary" : "outline"}>
@@ -426,19 +528,19 @@ const ManageSessions = () => {
                   </Badge>
                   <div className="flex gap-2">
                     {session.status === "Active" && (
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => updateSessionStatus(session.id, "Scheduled")}>
                         <Pause className="h-4 w-4" />
                       </Button>
                     )}
                     {session.status === "Scheduled" && (
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => updateSessionStatus(session.id, "Active")}>
                         <Play className="h-4 w-4" />
                       </Button>
                     )}
-                    <Button size="sm" variant="outline">
+                    <Button size="sm" variant="outline" onClick={() => updateSessionStatus(session.id, "Completed")}>
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="outline">
+                    <Button size="sm" variant="outline" onClick={() => removeSession(session.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

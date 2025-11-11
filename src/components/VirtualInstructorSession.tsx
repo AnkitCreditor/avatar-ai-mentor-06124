@@ -1,8 +1,7 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Video, VideoOff, MessageSquare, Settings, Maximize2 } from "lucide-react";
-import { useState } from "react";
-import avatarIcon from "@/assets/avatar-icon.png";
 
 const VirtualInstructorSession = () => {
   const [isMuted, setIsMuted] = useState(false);
@@ -15,9 +14,9 @@ const VirtualInstructorSession = () => {
       <Card className="relative aspect-video bg-gradient-to-br from-primary/5 to-background border-2 overflow-hidden">
         {isSessionActive ? (
           <div className="w-full h-full">
-            <video 
+            <video
               autoPlay
-              controls 
+              controls
               className="w-full h-full object-cover"
               src="https://lesson-banners.s3.us-east-1.amazonaws.com/Scorms/3a98d3a3-efc5-461d-9b60-7a1febc71947.mp4"
             >
@@ -32,7 +31,9 @@ const VirtualInstructorSession = () => {
               </div>
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold text-foreground">Session Ready</h3>
-                <p className="text-muted-foreground">Click "Start Session" to begin your virtual instructor session</p>
+                <p className="text-muted-foreground">
+                  Click "Start Session" to begin your virtual instructor session
+                </p>
               </div>
             </div>
           </div>
@@ -70,7 +71,7 @@ const VirtualInstructorSession = () => {
             >
               {isSessionActive ? "End Session" : "Start Session"}
             </Button>
-            
+
             <div className="flex gap-2">
               <Button
                 size="icon"
@@ -80,7 +81,7 @@ const VirtualInstructorSession = () => {
               >
                 {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
               </Button>
-              
+
               <Button
                 size="icon"
                 variant={!isVideoOn ? "destructive" : "secondary"}
