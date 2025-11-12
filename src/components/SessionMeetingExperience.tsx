@@ -475,9 +475,9 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
         >
           <Card className="flex h-full flex-col border border-border/60 bg-background/80 shadow-lg backdrop-blur">
             <CardContent className="flex flex-1 flex-col justify-between space-y-4 overflow-hidden">
-              <div className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-[32px] border border-border/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 shadow-2xl aspect-video">
+            <div className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-[32px] border border-border/60 bg-white shadow-2xl aspect-video">
                 <div className="absolute inset-x-0 top-0 z-20 flex justify-end p-4">
-                  <div className="flex flex-wrap items-center gap-2 rounded-full bg-black/45 px-4 py-2 text-xs font-medium text-white shadow-lg backdrop-blur">
+                  <div className="flex flex-wrap items-center gap-2 rounded-full bg-black/45 px-4 py-1 text-xs font-medium text-white shadow-lg backdrop-blur">
                     <Button
                       variant="ghost"
                       size="sm"
