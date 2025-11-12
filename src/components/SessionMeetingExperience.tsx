@@ -393,8 +393,8 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
     return (
       <Card className="overflow-hidden border border-border">
         <div className="grid gap-8 p-6 lg:grid-cols-[2fr_1fr]">
-            <div className="space-y-6">
-              <div className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-background to-muted aspect-[16/9]">
+          <div className="space-y-6">
+              <div className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-[28px] border border-border bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 shadow-2xl aspect-video">
               {previewContent}
 
               <div className="absolute inset-x-4 bottom-4 flex justify-center gap-3">
@@ -466,67 +466,6 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-      <header className="flex flex-col gap-3 border-b border-border bg-muted/40 px-6 py-4 backdrop-blur-md md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-1 flex-col gap-2 md:flex-row md:items-center md:gap-4">
-          <div className="flex items-center gap-2 rounded-full bg-background/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground shadow-sm">
-            <Timer className="h-3 w-3 text-primary" />
-            00:12 elapsed
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span>AI guidance active for all learners</span>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 rounded-full px-3"
-            onClick={() => setShowModal((prev) => !prev)}
-          >
-            <MessageSquare className="h-4 w-4" />
-            Chat
-          </Button>
-          <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3">
-            <Users className="h-4 w-4" />
-            People
-          </Button>
-          <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3">
-            <Hand className="h-4 w-4" />
-            Raise
-          </Button>
-          <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3">
-            <Smile className="h-4 w-4" />
-            React
-          </Button>
-          <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3">
-            <Monitor className="h-4 w-4" />
-            View
-          </Button>
-          <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3">
-            <Ellipsis className="h-4 w-4" />
-            More
-          </Button>
-          <Button
-            variant={isMicOn ? "secondary" : "destructive"}
-            size="sm"
-            className="gap-2 rounded-full px-3"
-            onClick={() => setIsMicOn((prev) => !prev)}
-          >
-            {isMicOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-            {isMicOn ? "Mic on" : "Mic off"}
-          </Button>
-          <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3" onClick={handleCopyLink}>
-            <Share2 className="h-4 w-4" />
-            Share
-          </Button>
-          <Button variant="destructive" size="sm" className="gap-2 rounded-full px-3" onClick={handleLeaveSession}>
-            <PhoneOff className="h-4 w-4" />
-            Leave
-          </Button>
-        </div>
-      </header>
-
       <main className="flex flex-1 flex-col overflow-hidden md:flex-row">
         <motion.section
           initial={{ opacity: 0, y: 24 }}
@@ -535,29 +474,60 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
           className="flex flex-1 flex-col gap-4 overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background px-6 py-6"
         >
           <Card className="flex h-full flex-col border border-border/60 bg-background/80 shadow-lg backdrop-blur">
-            <CardHeader className="flex flex-col gap-3 pb-4">
-              <CardTitle className="flex flex-col gap-1 text-lg font-semibold md:flex-row md:items-center md:justify-between">
-                <span>{courseTitle}</span>
-                <span className="text-sm font-normal text-muted-foreground">
-                  Meeting ID: {sessionId ?? "Shared link"}
-                </span>
-              </CardTitle>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-primary" />
-                  <span>{participantCount}+ learners connected</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Bot className="h-4 w-4 text-primary" />
-                  <span>AI tutor standing by for questions</span>
-                </div>
-              </div>
-            </CardHeader>
-
             <CardContent className="flex flex-1 flex-col justify-between space-y-4 overflow-hidden">
-              <div className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-[28px] border border-border/60 bg-gradient-to-br from-black via-zinc-900 to-gray-950 shadow-2xl aspect-[5/3]">
+              <div className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-[32px] border border-border/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 shadow-2xl aspect-video">
+                <div className="absolute inset-x-0 top-0 z-20 flex justify-end p-4">
+                  <div className="flex flex-wrap items-center gap-2 rounded-full bg-black/45 px-4 py-2 text-xs font-medium text-white shadow-lg backdrop-blur">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-2 rounded-full px-3 text-white hover:bg-white/10"
+                      onClick={() => setShowModal((prev) => !prev)}
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      Chat
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3 text-white hover:bg-white/10">
+                      <Users className="h-4 w-4" />
+                      People
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3 text-white hover:bg-white/10">
+                      <Hand className="h-4 w-4" />
+                      Raise
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3 text-white hover:bg-white/10">
+                      <Smile className="h-4 w-4" />
+                      React
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3 text-white hover:bg-white/10">
+                      <Monitor className="h-4 w-4" />
+                      View
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3 text-white hover:bg-white/10">
+                      <Ellipsis className="h-4 w-4" />
+                      More
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`gap-2 rounded-full px-3 ${isMicOn ? "bg-white/10 text-white hover:bg-white/20" : "bg-destructive text-destructive-foreground hover:bg-destructive/90"}`}
+                      onClick={() => setIsMicOn((prev) => !prev)}
+                    >
+                      {isMicOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                      {isMicOn ? "Mic on" : "Mic off"}
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3 text-white hover:bg-white/10" onClick={handleCopyLink}>
+                      <Share2 className="h-4 w-4" />
+                      Share
+                    </Button>
+                    <Button variant="destructive" size="sm" className="gap-2 rounded-full px-3" onClick={handleLeaveSession}>
+                      <PhoneOff className="h-4 w-4" />
+                      Leave
+                    </Button>
+                  </div>
+                </div>
                 <video
-                  className="h-full w-full object-contain bg-gradient-to-br from-black via-neutral-900 to-black p-4"
+                  className="h-full w-full object-cover object-[50%_25%]"
                   src="https://lesson-banners.s3.us-east-1.amazonaws.com/Scorms/3a98d3a3-efc5-461d-9b60-7a1febc71947.mp4"
                   autoPlay
                   loop
@@ -596,10 +566,6 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
               )}
 
               <div className="flex flex-col items-center gap-3">
-                <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/80 px-4 py-1 text-xs uppercase tracking-wide text-muted-foreground shadow-sm backdrop-blur">
-                  <MessageSquare className="h-3 w-3 text-primary" />
-                  Collaboration hub ready
-                </div>
                 <div className="flex flex-wrap items-center justify-center gap-3 rounded-full bg-muted/50 px-6 py-3 shadow-lg backdrop-blur">
                   <Button
                     variant={isMicOn ? "secondary" : "destructive"}
