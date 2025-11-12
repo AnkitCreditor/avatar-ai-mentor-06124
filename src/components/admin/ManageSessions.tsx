@@ -319,10 +319,6 @@ const ManageSessions = () => {
                   <ImageIcon className="h-5 w-5 text-primary" />
                   <Label className="text-lg font-semibold">Background</Label>
                 </div>
-                {/*
-                  Demo preset backgrounds: feel free to expand with more images later.
-                  We'll include a few options plus upload.
-                */}
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { id: "bg-classroom", name: "Classroom (Default)", url: classroomBackground },
@@ -385,28 +381,40 @@ const ManageSessions = () => {
                     />
                   </label>
                 </div>
-                {instructorConfig.background ? (
-                  <div className="rounded-lg border border-border p-3">
-                    <div className="mb-2 text-sm font-medium text-foreground">Selected background preview</div>
-                    <div className="aspect-video w-full overflow-hidden rounded-md border border-border">
-                      {instructorConfig.background.startsWith("data:gradient/") ? (
-                        <div
-                          className={`h-full w-full ${
-                            instructorConfig.background.endsWith("purple")
-                              ? "bg-gradient-to-br from-fuchsia-500/40 via-purple-500/30 to-indigo-500/40"
-                              : "bg-gradient-to-br from-sky-500/40 via-cyan-500/30 to-blue-500/40"
-                          }`}
-                        />
-                      ) : (
-                        <img
-                          src={instructorConfig.background}
-                          alt="Selected background"
-                          className="h-full w-full object-cover"
-                        />
-                      )}
-                    </div>
+                <div className="rounded-lg border border-border p-3">
+                  <div className="mb-2 text-sm font-medium text-foreground">Visual Preview</div>
+                  <div className="relative aspect-video w-full overflow-hidden rounded-md border border-border">
+                    {/* Background */}
+                    {instructorConfig.background && instructorConfig.background.startsWith("data:gradient/") ? (
+                      <div
+                        className={`h-full w-full ${
+                          instructorConfig.background.endsWith("purple")
+                            ? "bg-gradient-to-br from-fuchsia-500/40 via-purple-500/30 to-indigo-500/40"
+                            : "bg-gradient-to-br from-sky-500/40 via-cyan-500/30 to-blue-500/40"
+                        }`}
+                      />
+                    ) : (
+                      <img
+                        src={instructorConfig.background || classroomBackground}
+                        alt="Selected background"
+                        className="h-full w-full object-cover"
+                      />
+                    )}
+                    {/* Avatar overlay at bottom center with zero bottom padding */}
+                    {instructorConfig.avatar && (() => {
+                      const selectedAvatar = AVATARS.find(a => a.id === instructorConfig.avatar);
+                      return selectedAvatar ? (
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 pb-0">
+                          <img
+                            src={selectedAvatar.imageUrl}
+                            alt={selectedAvatar.name}
+                            className="h-auto max-h-[60%] w-auto object-contain"
+                          />
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
-                ) : null}
+                </div>
               </div>
 
               {/* Voice Selection */}

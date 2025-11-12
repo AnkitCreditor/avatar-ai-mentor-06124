@@ -25,7 +25,7 @@ const Sidebar = () => {
           <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
             <BookOpen className="h-6 w-6 text-primary-foreground" />
           </div>
-          <span className="text-lg font-bold text-foreground">EduPlatform</span>
+          <span className="text-lg font-bold text-foreground">LMSAthena</span>
         </div>
       </div>
 
@@ -67,7 +67,7 @@ const Sidebar = () => {
             JD
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">John Doe</p>
+            <p className="text-sm font-medium text-foreground truncate">Ankit Kumar</p>
             <p className="text-xs text-muted-foreground truncate">Student</p>
           </div>
         </div>
