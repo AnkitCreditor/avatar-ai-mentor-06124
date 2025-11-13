@@ -474,7 +474,7 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
           className="flex flex-1 min-h-0 flex-col overflow-hidden relative"
         >
           <div className="relative w-full h-full min-h-0 overflow-hidden">
-                <div className="absolute inset-x-0 top-0 z-20 flex justify-end p-4">
+                <div className="absolute inset-x-0 top-0 z-20 flex justify-end">
                   <div className="flex flex-wrap items-center gap-2 rounded-full bg-black/45 px-4 py-1 text-xs font-medium text-white shadow-lg backdrop-blur">
                     <Button
                       variant="ghost"
@@ -535,7 +535,7 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
-                <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-red-600/90 px-3 py-1 text-xs font-semibold text-white shadow-lg animate-pulse">
+                <div className="absolute left-4 top-4 flex items-center gap-0 rounded-full bg-red-600/90 px-3 py-1 text-xs font-semibold text-white shadow-lg animate-pulse">
                   <span className="h-2 w-2 rounded-full bg-white" />
                   Live now
                 </div>
