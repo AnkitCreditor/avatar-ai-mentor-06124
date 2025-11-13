@@ -487,20 +487,13 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                   </span>
                   Live
                 </div>
-                <span className="rounded-full bg-white/15 px-3 py-1 text-xs text-white/80 backdrop-blur">
-                  {participantCount}+ learners
-                </span>
+                
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 text-xs text-white/70">
-                <span className="rounded-full bg-white/15 px-3 py-1 backdrop-blur">Course · {courseTitle}</span>
-                <span className="rounded-full bg-white/15 px-3 py-1 backdrop-blur">
-                  <Timer className="mr-1 inline h-3 w-3" />
-                  00:12 elapsed
-                </span>
-                <span className="rounded-full bg-white/15 px-3 py-1 backdrop-blur">
-                  Meeting ID: {sessionId ?? "Shared link"}
-                </span>
+              <div >
+                
+                
+              
               </div>
             </div>
 
