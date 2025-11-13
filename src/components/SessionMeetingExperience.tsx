@@ -466,16 +466,16 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-      <main className="flex flex-1 flex-col overflow-hidden md:flex-row">
+      <main className="flex flex-1 flex-col overflow-hidden md:flex-row min-h-0">
         <motion.section
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex flex-1 flex-col gap-4 overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background px-6 py-6"
+          className="flex flex-1 flex-col overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background min-h-0"
         >
-          <Card className="flex h-full flex-col border border-border/60 bg-background/80 shadow-lg backdrop-blur">
-            <CardContent className="flex flex-1 flex-col justify-between space-y-4 overflow-hidden">
-            <div className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-[32px] border border-border/60 bg-white shadow-2xl aspect-video">
+          <Card className="flex h-full flex-col border-0 bg-transparent shadow-none">
+            <CardContent className="flex flex-1 flex-col p-0 overflow-hidden min-h-0">
+            <div className="relative w-full h-full min-h-0 overflow-hidden">
                 <div className="absolute inset-x-0 top-0 z-20 flex justify-end p-4">
                   <div className="flex flex-wrap items-center gap-2 rounded-full bg-black/45 px-4 py-1 text-xs font-medium text-white shadow-lg backdrop-blur">
                     <Button
@@ -499,9 +499,14 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                       <Smile className="h-4 w-4" />
                       React
                     </Button>
-                    <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3 text-white hover:bg-white/10">
-                      <Monitor className="h-4 w-4" />
-                      View
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`gap-2 rounded-full px-3 text-white hover:bg-white/10 ${showCaptions ? "bg-white/20" : ""}`}
+                      onClick={() => setShowCaptions((prev) => !prev)}
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      Captions
                     </Button>
                     <Button variant="ghost" size="sm" className="gap-2 rounded-full px-3 text-white hover:bg-white/10">
                       <Ellipsis className="h-4 w-4" />
@@ -527,7 +532,7 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                   </div>
                 </div>
                 <video
-                  className="h-full w-full object-cover object-[50%_25%]"
+                  className="h-full w-full object-cover object-center"
                   src="https://lesson-banners.s3.us-east-1.amazonaws.com/Scorms/3a98d3a3-efc5-461d-9b60-7a1febc71947.mp4"
                   autoPlay
                   loop
@@ -564,49 +569,13 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                   {mediaError}
                 </div>
               )}
-
-              <div className="flex flex-col items-center gap-3">
-                <div className="flex flex-wrap items-center justify-center gap-3 rounded-full bg-muted/50 px-6 py-3 shadow-lg backdrop-blur">
-                  <Button
-                    variant={isMicOn ? "secondary" : "destructive"}
-                    className="flex h-14 w-14 items-center justify-center rounded-full"
-                    onClick={() => setIsMicOn((prev) => !prev)}
-                  >
-                    {isMicOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-                  </Button>
-                  <Button
-                    variant={showCaptions ? "default" : "outline"}
-                    className="flex h-14 w-14 items-center justify-center rounded-full"
-                    onClick={() => setShowCaptions((prev) => !prev)}
-                  >
-                    <MessageSquare className="h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex h-14 w-14 items-center justify-center rounded-full"
-                    onClick={handleCopyLink}
-                  >
-                    <Share2 className="h-5 w-5" />
-                  </Button>
-                  <Button variant="outline" className="flex h-14 w-14 items-center justify-center rounded-full">
-                    <Smile className="h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex h-14 w-14 items-center justify-center rounded-full"
-                    onClick={handleLeaveSession}
-                  >
-                    <PhoneOff className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </motion.section>
 
         {showModal && (
-          <aside className="flex min-h-[320px] w-full max-w-md flex-col border-t border-border bg-muted/20 backdrop-blur md:h-auto md:border-l md:border-t-0">
-            <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <aside className="flex w-full max-w-md flex-col border-t border-border bg-muted/20 backdrop-blur md:h-full md:border-l md:border-t-0 min-h-0">
+            <div className="flex items-center justify-between border-b border-border px-5 py-4 flex-shrink-0">
               <div>
                 <h3 className="text-base font-semibold">Meeting chat</h3>
                 <p className="text-xs text-muted-foreground">Chat, AI tutor, and resources</p>
@@ -616,8 +585,8 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
               </Button>
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col overflow-hidden px-5 py-4">
-              <TabsList className="grid w-full grid-cols-3 rounded-xl bg-muted/50 p-1">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col overflow-hidden px-5 py-4 min-h-0">
+              <TabsList className="grid w-full grid-cols-3 rounded-xl bg-muted/50 p-1 flex-shrink-0">
                 <TabsTrigger
                   value="session-chat"
                   className="rounded-lg text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground"
@@ -638,8 +607,8 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                 </TabsTrigger>
               </TabsList>
 
-              <div className="mt-4 flex-1 overflow-hidden rounded-2xl border border-border/60 bg-background/80 shadow-inner">
-                <TabsContent value="session-chat" className="h-full">
+              <div className="mt-4 flex-1 overflow-hidden rounded-2xl border border-border/60 bg-background/80 shadow-inner min-h-0">
+                <TabsContent value="session-chat" className="h-full m-0">
                   <ScrollArea className="h-full px-4 py-4">
                     <div className="space-y-4">
                       {sessionChat.map((message) => (
@@ -663,7 +632,7 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                   </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="chatbot" className="h-full">
+                <TabsContent value="chatbot" className="h-full m-0">
                   <ScrollArea className="h-full px-4 py-4">
                     <div className="space-y-4">
                       {chatbotMessages.map((message) => (
@@ -686,7 +655,7 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                   </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="resources" className="h-full">
+                <TabsContent value="resources" className="h-full m-0">
                   <div className="flex h-full flex-col gap-3 px-5 py-4 text-sm">
                     <div>
                       <p className="font-medium text-foreground">Lesson Materials</p>
@@ -701,7 +670,7 @@ const SessionMeetingExperience = ({ sessionId, courseTitle = "AI Instructor Mast
                 </TabsContent>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-border/60 bg-background/90 p-4 shadow-lg">
+              <div className="mt-4 rounded-2xl border border-border/60 bg-background/90 p-4 shadow-lg flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex flex-col gap-2">
                   <Textarea
                     placeholder={
