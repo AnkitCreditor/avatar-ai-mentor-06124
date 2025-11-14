@@ -1,27 +1,32 @@
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Bot,
+  Captions as CaptionsIcon,
   Check,
   Copy,
+  Hand,
   Image as ImageIcon,
+  Info,
+  Loader2,
   MessageSquare,
   Mic,
   MicOff,
   PhoneOff,
-  Sparkles,
+  Share2,
+  Smile,
   Timer,
+  Upload,
   Users,
   Video,
   VideoOff,
-  Loader2,
-  Upload,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getBaseOrigin } from "@/lib/sessionStorage";
@@ -122,6 +127,28 @@ const SessionMeetingExperience = ({
   const [hasRenderedVirtualBackgroundFrame, setHasRenderedVirtualBackgroundFrame] = useState(false);
   const [backgroundTimeoutExceeded, setBackgroundTimeoutExceeded] = useState(false);
   const [customBackground, setCustomBackground] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [activePanel, setActivePanel] = useState<"chat" | "info" | null>(null);
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const { style: bodyStyle } = document.body;
+    const { style: htmlStyle } = document.documentElement;
+    const previousBodyOverflow = bodyStyle.overflow;
+    const previousHtmlOverflow = htmlStyle.overflow;
+
+    bodyStyle.overflow = "hidden";
+    htmlStyle.overflow = "hidden";
+
+    return () => {
+      bodyStyle.overflow = previousBodyOverflow;
+      htmlStyle.overflow = previousHtmlOverflow;
+    };
+  }, []);
+
 
   const [sessionChat, setSessionChat] = useState<ChatMessage[]>([
     {
@@ -474,6 +501,16 @@ const SessionMeetingExperience = ({
     }
   };
 
+  const openPanel = (panel: "chat" | "info") => {
+    setActivePanel(panel);
+    setShowModal(true);
+  };
+
+  const closePanel = () => {
+    setShowModal(false);
+    setActivePanel(null);
+  };
+
   const stopStream = (stream: MediaStream | null) => {
     stream?.getTracks().forEach((track) => track.stop());
   };
@@ -811,7 +848,7 @@ const SessionMeetingExperience = ({
           <div className="grid gap-6 p-6 lg:grid-cols-[2fr_1fr]">
             <div className="space-y-4">
               <div
-                className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-background to-muted"
+                className="relative mx-auto aspect-video w-full max-w-4xl overflow-hidden rounded-[28px] border border-border bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 shadow-2xl"
                 style={appliedBackgroundStyle}
               >
                 {previewContent}
@@ -842,7 +879,6 @@ const SessionMeetingExperience = ({
                 >
                   <ImageIcon className="h-4 w-4" />
                 </Button>
-
               </div>
 
               <div className="rounded-xl border border-border bg-muted/50 p-4 text-sm">
@@ -903,265 +939,306 @@ const SessionMeetingExperience = ({
   }
 
   return (
-    <>
-      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <div className="space-y-4">
-          <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="space-y-1">
-                <h1 className="text-2xl font-semibold text-foreground">{courseTitle}</h1>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span>{participantCount}+ learners connected</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    <span>Session chat &amp; live Q&amp;A enabled</span>
-                  </div>
+    <div className="flex min-h-screen flex-col bg-neutral-900 text-neutral-50">
+      <main className="relative flex flex-1 overflow-hidden">
+        <motion.section
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative flex flex-1 overflow-hidden bg-black"
+        >
+          <video
+            className="absolute inset-0 h-full w-full object-cover"
+            src="https://lesson-banners.s3.us-east-1.amazonaws.com/Scorms/3a98d3a3-efc5-461d-9b60-7a1febc71947.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70" />
+
+          <div className="absolute inset-0 flex flex-col justify-between">
+            <div className="flex flex-col gap-3 p-6 text-sm text-white">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide shadow-lg">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                  </span>
+                  Live
                 </div>
+                
               </div>
-              <div className="flex flex-wrap gap-2">
-                <div className="rounded-md border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                  Meeting ID: <span className="font-mono text-foreground">{sessionId ?? "Shared link"}</span>
+
+              <div >
+                
+                
+              
+              </div>
+            </div>
+
+            <div className="flex flex-1 items-end justify-between px-6 pb-4">
+              {mediaError ? (
+                <div className="rounded-2xl border border-destructive/40 bg-destructive/20 px-4 py-3 text-sm text-white shadow-lg backdrop-blur">
+                  {mediaError}
                 </div>
-                <Button variant="outline" size="sm" className="gap-2" onClick={handleCopyLink}>
-                  <Copy className="h-3 w-3" />
-                  Copy Link
+              ) : (
+                <div />
+              )}
+
+              {isCameraOn && localStream ? (
+                <div className="h-32 w-32 overflow-hidden rounded-2xl border border-white/20 bg-black/80 shadow-2xl backdrop-blur">
+                  <video ref={stageVideoRef} className="h-full w-full object-cover" muted playsInline autoPlay />
+                </div>
+              ) : null}
+            </div>
+
+            <div className="border-t border-white/10 bg-neutral-900/95 px-6 py-2">
+              {showCaptions && (
+                <div className="mx-auto mb-3 max-w-xl rounded-full bg-black/70 px-5 py-2 text-center text-xs font-medium text-white shadow-lg backdrop-blur">
+                  {currentCaption}
+                </div>
+              )}
+
+              <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-2 text-xs">
+                <Button
+                  variant="secondary"
+                  className={`flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-white hover:bg-white/20 ${
+                    activePanel === "chat" && showModal ? "!bg-white/25" : ""
+                  }`}
+                  onClick={() =>
+                    showModal && activePanel === "chat" ? closePanel() : openPanel("chat")
+                  }
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Chat
+                </Button>
+
+                <Button
+                  variant={isMicOn ? "secondary" : "destructive"}
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
+                  onClick={() => setIsMicOn((prev) => !prev)}
+                >
+                  {isMicOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${showCaptions ? "!bg-white/30" : ""}`}
+                  onClick={() => setShowCaptions((prev) => !prev)}
+                >
+                  <CaptionsIcon className="h-5 w-5" />
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${
+                    activePanel === "info" && showModal ? "!bg-white/30" : ""
+                  }`}
+                  onClick={() =>
+                    showModal && activePanel === "info" ? closePanel() : openPanel("info")
+                  }
+                >
+                  <Info className="h-5 w-5" />
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
+                >
+                  <Hand className="h-5 w-5" />
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
+                >
+                  <Smile className="h-5 w-5" />
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-red-600 text-white hover:bg-red-500"
+                  onClick={handleLeaveSession}
+                >
+                  <PhoneOff className="h-5 w-5" />
                 </Button>
               </div>
             </div>
           </div>
+        </motion.section>
 
-          <Card className="border border-border">
-            <CardContent className="space-y-4 pt-4">
-              <div className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-black lg:max-h-[420px]">
-                <video
-                  className="h-full w-full object-cover"
-                  src="https://lesson-banners.s3.us-east-1.amazonaws.com/Scorms/3a98d3a3-efc5-461d-9b60-7a1febc71947.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-background/40" />
-
-                <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-primary shadow">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-                  Live now
+        <AnimatePresence>
+          {showModal && activePanel ? (
+            <motion.aside
+              initial={{ x: 320, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 320, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="relative z-40 h-full w-full max-w-sm border-l border-white/10 bg-neutral-900/95 text-neutral-100 backdrop-blur"
+            >
+              <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                <div>
+                  <h3 className="text-base font-semibold">
+                    {activePanel === "chat" ? "Collaboration" : "Meeting info"}
+                  </h3>
+                  <p className="text-xs text-neutral-400">
+                    {activePanel === "chat" ? "Chat, AI tutor, and resources" : "Share details with participants"}
+                  </p>
                 </div>
-
-                <div className="absolute right-4 top-4 flex items-center gap-2 rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow">
-                  <Timer className="h-3 w-3" />
-                  00:12 elapsed
-                </div>
-
-                {isCameraOn && localStream ? (
-                  <div
-                    className="absolute bottom-4 right-4 h-32 w-32 overflow-hidden rounded-xl border border-background/40 bg-background/80 shadow-lg backdrop-blur"
-                    style={!shouldUseVirtualBackground ? appliedBackgroundStyle : undefined}
-                  >
-                    <div className="relative h-full w-full">
-                      <video
-                        ref={stageVideoRef}
-                        className={`${
-                          shouldUseVirtualBackground && !virtualBackgroundError && !backgroundTimeoutExceeded
-                            ? "hidden"
-                            : "h-full w-full object-cover"
-                        }`}
-                        muted
-                        playsInline
-                        autoPlay
-                      />
-                      {shouldUseVirtualBackground && !virtualBackgroundError ? (
-                        <>
-                          <canvas ref={stageCanvasRef} className="h-full w-full object-cover" />
-                          {(!hasRenderedVirtualBackgroundFrame || isApplyingVirtualBackground) && !backgroundTimeoutExceeded && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-background/70">
-                              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                            </div>
-                          )}
-                        </>
-                      ) : null}
-                      {backgroundTimeoutExceeded && (
-                        <div className="absolute inset-x-1 bottom-1 rounded bg-background/80 px-2 py-1 text-[10px] text-muted-foreground shadow">
-                          Virtual background still loading…
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : null}
-
-                {showCaptions && (
-                  <div className="absolute bottom-6 left-1/2 w-[90%] max-w-xl -translate-x-1/2 rounded-lg bg-background/90 px-4 py-3 text-center text-sm font-medium text-foreground shadow-lg">
-                    {currentCaption}
-                  </div>
-                )}
-
+                <Button size="sm" variant="ghost" className="rounded-full px-3 text-neutral-300 hover:bg-white/10" onClick={closePanel}>
+                  Close
+                </Button>
               </div>
 
-              {mediaError && (
-                <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                  {mediaError}
+              {activePanel === "chat" ? (
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4">
+                  <TabsList className="flex-shrink-0 grid grid-cols-3 rounded-full bg-white/10 p-1 text-xs">
+                    <TabsTrigger value="session-chat" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
+                      Session
+                    </TabsTrigger>
+                    <TabsTrigger value="chatbot" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
+                      AI Tutor
+                    </TabsTrigger>
+                    <TabsTrigger value="resources" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
+                      Resources
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <div className="mt-4 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
+                    <TabsContent value="session-chat" className="h-full">
+                      <ScrollArea className="h-full px-4 py-4">
+                        <div className="space-y-4">
+                          {sessionChat.map((message) => (
+                            <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
+                              <div
+                                className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
+                                  message.source === "participant"
+                                    ? "bg-primary/90 text-primary-foreground shadow-md"
+                                    : message.source === "instructor"
+                                    ? "bg-neutral-800 text-white shadow-sm"
+                                    : "bg-neutral-700 text-white"
+                                }`}
+                              >
+                                <p className="font-medium">{message.sender}</p>
+                                <p>{message.message}</p>
+                                <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </TabsContent>
+
+                    <TabsContent value="chatbot" className="h-full">
+                      <ScrollArea className="h-full px-1 py-1">
+                        <div className="space-y-4">
+                          {chatbotMessages.map((message) => (
+                            <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
+                              <div
+                                className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
+                                  message.source === "participant"
+                                    ? "bg-primary/90 text-primary-foreground shadow-md"
+                                    : "bg-neutral-700 text-white"
+                                }`}
+                              >
+                                <p className="flex items-center gap-2 font-medium">
+                                  {message.source === "bot" && <Bot className="h-3 w-3" />}
+                                  {message.sender}
+                                </p>
+                                <p>{message.message}</p>
+                                <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </TabsContent>
+
+                    <TabsContent value="resources" className="h-full">
+                      <div className="flex h-full flex-col gap-3 px-5 py-4 text-sm">
+                        <div>
+                          <p className="font-medium text-white">Lesson Materials</p>
+                          <p className="text-neutral-400">Slides, worksheets, and recordings will appear here.</p>
+                        </div>
+                        <ul className="list-inside list-disc space-y-1 text-neutral-400">
+                          <li>Interactive whiteboard snapshots</li>
+                          <li>Recommended follow-up practice</li>
+                          <li>Session transcript (auto-generated)</li>
+                        </ul>
+                      </div>
+                    </TabsContent>
+                  </div>
+
+                  <div className="mt-4 flex-shrink-0 rounded-2xl border border-white/10 bg-neutral-900 px-4 py-4 shadow-lg">
+                    <form onSubmit={handleSendMessage} className="flex flex-col gap-2">
+                      <Textarea
+                        placeholder={
+                          activeTab === "chatbot" ? "Ask the AI tutor a quick question..." : "Share an update or ask the group something..."
+                        }
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        className="min-h-[80px] resize-none bg-neutral-950/70 text-white"
+                      />
+                      <div className="flex items-center justify-between text-xs text-neutral-400">
+                        <span>{displayName || "You"} {isMicOn ? "(mic on)" : "(mic muted)"}</span>
+                        <Button type="submit" size="sm" className="gap-2 rounded-full bg-primary px-4 text-white hover:bg-primary/90">
+                          <MessageSquare className="h-4 w-4" />
+                          Send
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
+                </Tabs>
+              ) : (
+                <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
+                  <div className="rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
+                    <h4 className="text-base font-semibold">Meeting details</h4>
+                    <p className="mt-2 text-xs text-neutral-400">Share these details with anyone who needs to join.</p>
+                    <div className="mt-4 space-y-2 text-xs">
+                      <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                        <span className="font-semibold text-neutral-100">Course</span>
+                        <span className="text-neutral-300">{courseTitle}</span>
+                      </div>
+                      <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                        <span className="font-semibold text-neutral-100">Elapsed</span>
+                        <span className="text-neutral-300">00:12</span>
+                      </div>
+                      <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                        <span className="font-semibold text-neutral-100">Meeting ID</span>
+                        <span className="text-neutral-300">{sessionId ?? "Shared link"}</span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      className="mt-4 w-full justify-center rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
+                      onClick={handleCopyLink}
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Copy invite link
+                    </Button>
+                  </div>
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
+                    <h4 className="text-base font-semibold">Participants overview</h4>
+                    <p className="mt-2 text-xs text-neutral-400">
+                      {participantCount}+ learners connected. Use the chat to collaborate in real-time.
+                    </p>
+                  </div>
                 </div>
               )}
-
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-muted/60 p-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <span>AI-powered explanations and resources enabled</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={isMicOn ? "secondary" : "destructive"}
-                    className="gap-2"
-                    onClick={() => setIsMicOn((prev) => !prev)}
-                  >
-                    {isMicOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-                    {isMicOn ? "Mute" : "Unmute"}
-                  </Button>
-                  <Button
-                    variant={isCameraOn ? "secondary" : "destructive"}
-                    className="gap-2"
-                    onClick={() => setIsCameraOn((prev) => !prev)}
-                  >
-                    {isCameraOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
-                    {isCameraOn ? "Stop Video" : "Turn Video On"}
-                  </Button>
-                  <Button
-                    variant={showCaptions ? "default" : "outline"}
-                    className="gap-2"
-                    onClick={() => setShowCaptions((prev) => !prev)}
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    {showCaptions ? "Hide Captions" : "Show Captions"}
-                  </Button>
-                  <Button variant="destructive" className="gap-2" onClick={handleLeaveSession}>
-                    <PhoneOff className="h-4 w-4" />
-                    Leave Session
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-4">
-          <Card className="flex h-full flex-col border border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Collaboration Hub</CardTitle>
-              <p className="text-xs text-muted-foreground">
-                Chat with classmates, ask the AI tutor, or review shared resources.
-              </p>
-            </CardHeader>
-
-            <CardContent className="flex-1">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-4 grid w-full grid-cols-3">
-                  <TabsTrigger value="session-chat">Session Chat</TabsTrigger>
-                  <TabsTrigger value="chatbot">AI Chatbot</TabsTrigger>
-                  <TabsTrigger value="resources">Resources</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="session-chat">
-                  <ScrollArea className="h-64 rounded-lg border border-border bg-muted/40 p-4">
-                    <div className="space-y-4">
-                      {sessionChat.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}
-                        >
-                          <div
-                            className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                              message.source === "participant"
-                                ? "bg-primary text-primary-foreground"
-                                : message.source === "instructor"
-                                  ? "bg-background text-foreground shadow-sm"
-                                  : "bg-secondary text-secondary-foreground"
-                            }`}
-                          >
-                            <p className="font-medium">{message.sender}</p>
-                            <p>{message.message}</p>
-                            <p className="mt-1 text-[10px] uppercase tracking-wide opacity-70">{message.timestamp}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-
-                <TabsContent value="chatbot">
-                  <ScrollArea className="h-64 rounded-lg border border-border bg-muted/40 p-4">
-                    <div className="space-y-4">
-                      {chatbotMessages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}
-                        >
-                          <div
-                            className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                              message.source === "participant"
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-secondary text-secondary-foreground"
-                            }`}
-                          >
-                            <p className="flex items-center gap-2 font-medium">
-                              {message.source === "bot" && <Bot className="h-3 w-3" />}
-                              {message.sender}
-                            </p>
-                            <p>{message.message}</p>
-                            <p className="mt-1 text-[10px] uppercase tracking-wide opacity-70">{message.timestamp}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-
-                <TabsContent value="resources">
-                  <div className="space-y-3 rounded-lg border border-dashed border-border p-4 text-sm">
-                    <div>
-                      <p className="font-medium text-foreground">Lesson Materials</p>
-                      <p className="text-muted-foreground">Slides, worksheets, and recordings will appear here.</p>
-                    </div>
-                    <ul className="list-inside list-disc space-y-1 text-muted-foreground">
-                      <li>Interactive whiteboard snapshots</li>
-                      <li>Recommended follow-up practice</li>
-                      <li>Session transcript (auto-generated)</li>
-                    </ul>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-
-            <CardFooter className="pt-0">
-              <form className="flex w-full flex-col gap-2" onSubmit={handleSendMessage}>
-                <Textarea
-                  placeholder={
-                    activeTab === "chatbot"
-                      ? "Ask the AI tutor a quick question..."
-                      : "Share an update or ask the group something..."
-                  }
-                  value={chatInput}
-                  onChange={(event) => setChatInput(event.target.value)}
-                  className="min-h-[80px]"
-                />
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{displayName || "You"} (muted)</span>
-                  <Button type="submit" size="sm" className="gap-2 self-end">
-                    <MessageSquare className="h-4 w-4" />
-                    Send
-                  </Button>
-                </div>
-              </form>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
-      {backgroundDialog}
-    </>
+            </motion.aside>
+          ) : null}
+        </AnimatePresence>
+      </main>
+    </div>
   );
 };
 
 export default SessionMeetingExperience;
-
