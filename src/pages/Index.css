@@ -234,59 +234,50 @@
   pointer-events: none;
   z-index: 3;
 }
+
 .scroller-wrapper::before {
   left: 0;
   background: linear-gradient(to right, var(--background), transparent);
 }
+
 .scroller-wrapper::after {
   right: 0;
   background: linear-gradient(to left, var(--background), transparent);
 }
-
-
 
 .card-scroller {
   display: flex;
   gap: 16px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding-bottom: 8px;
-  /* prevents items from jumping */
   scroll-snap-type: x mandatory;
-
-  -ms-overflow-style: none; /* hide scrollbar (IE/Edge) */
-  scrollbar-width: none;
+  padding-bottom: 12px;
 }
-
 
 .card-scroller::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-.card-scroller-item {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-}
-.carousel-card {
-  width: 340px; /* match the JS CARD_WIDTH */
+  display: none;
 }
 
 .card-scroller {
-  cursor: grab;
+  scrollbar-width: none;
 }
-.card-scroller:active {
-  cursor: grabbing;
+
+.card-scroller-item {
+  scroll-snap-align: start;
+  flex-shrink: 0;
 }
 
 /* enforce uniform card height and ensure cards occupy full item area */
 .card-scroller-item {
   align-items: stretch;
 }
+
 .card-scroller-item .carousel-card {
   height: 280px; /* slightly reduced to remove excess bottom space */
   display: flex;
   flex-direction: column;
 }
+
 /* internal layout uses existing card component classes; no extra rules needed here */
 
 /* better touch behavior: allow vertical page scroll but enable horizontal drag gestures */
@@ -299,7 +290,6 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
-
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -308,23 +298,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
   transition: 0.2s ease;
   opacity: 0; /* hidden until hover */
 }
+
 .scroller-wrapper:hover .scroller-nav {
   opacity: 1;
 }
 
+.scroller-prev {
+  left: -10px;
+}
 
-.scroller-prev { left: -10px; }
-.scroller-next { right: -10px; }
+.scroller-next {
+  right: -10px;
+}
+
 .scroller-nav:hover {
   transform: translateY(-50%) scale(1.1);
   background: var(--accent);
   color: var(--accent-foreground);
 }
+
 @media (max-width: 600px) {
   .scroller-prev {
     left: 0;
@@ -334,11 +330,14 @@
   }
 }
 
-
-.scroller-nav:active { transform: translateY(-50%) scale(0.98); }
+.scroller-nav:active {
+  transform: translateY(-50%) scale(0.98);
+}
 
 /* ensure headings stay fixed and don't shift when scroller moves */
-.scroller-wrapper + h2, .scroller-wrapper + p { position: relative; }
+.scroller-wrapper + h2, .scroller-wrapper + p {
+  position: relative;
+}
 
 /* Prevent any horizontal page-level scroll that could show a bottom scrollbar */
 html, body {
