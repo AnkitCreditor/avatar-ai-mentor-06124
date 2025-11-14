@@ -121,6 +121,7 @@ const AdminAnalytics = () => {
             <div className="space-y-4">
               {[
                 { name: "Advanced Mathematics", students: 45, rating: 4.8 },
+                { name: "Advanced Mathematics", students: 45, rating: 4.8 },
                 { name: "Chemistry Basics", students: 52, rating: 4.7 },
                 { name: "Physics 101", students: 38, rating: 4.6 },
               ].map((course, idx) => (
