@@ -18,8 +18,8 @@ const SessionRoom = () => {
   }, [session?.shareLink, sessionId]);
 
   return (
-    <div className="min-h-screen bg-muted py-6">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4">
+    <div className="min-h-screen bg-muted ">
+      <div className="max-w-7xl mx-auto flex-col gap-0">
         <SessionMeetingExperience
           sessionId={sessionId}
           courseTitle={session?.course ?? "Virtual Instructor Session"}
