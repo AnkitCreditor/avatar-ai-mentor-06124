@@ -188,13 +188,8 @@ const SessionMeetingExperience = ({
     },
   ]);
 
-  const [chatbotMessages, setChatbotMessages] = useState<ChatMessage[]>([{
-    id: `bot-${Date.now()}`,
-    sender: "AI Tutor",
-    message: "Hello! How can I help you today?",
-    timestamp: formatTimestamp(),
-    source: "bot",
-  }]);
+  // Start with no seeded greeting so we only show real responses
+  const [chatbotMessages, setChatbotMessages] = useState<ChatMessage[]>([]);
 
   const [mediaError, setMediaError] = useState<string | null>(null);
   const [isRequestingMedia, setIsRequestingMedia] = useState(false);
@@ -751,13 +746,34 @@ const SessionMeetingExperience = ({
           body: JSON.stringify({ message: text }),
         })
           .then(async (res) => {
-            if (!res.ok) throw new Error("Failed to fetch chatbot response");
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
+            // If the backend returned an error status (e.g., 401), surface a clear message
+            if (!res.ok) {
+              const errText = res.status === 401
+                ? (data?.error ?? 'Unauthorized: check OPENROUTER_API_KEY')
+                : (data?.error ?? `Chat API error (status ${res.status})`);
+              setChatbotMessages((prev) => [
+                ...prev,
+                {
+                  id: `bot-${Date.now()}`,
+                  sender: "Athena LMS",
+                  message: errText,
+                  timestamp: formatTimestamp(),
+                  source: "bot",
+                },
+              ]);
+              return;
+            }
+
+            // Prefer the backend-normalized `assistant` field; fall back to other shapes for compatibility
             const content =
+              data?.assistant ??
               data?.choices?.[0]?.message?.content ??
               data?.data?.choices?.[0]?.message?.content ??
               data?.output_text ??
+              (data?.raw ? JSON.stringify(data.raw) : null) ??
               "I'm here to help.";
+
             setChatbotMessages((prev) => [
               ...prev,
               {
@@ -769,7 +785,8 @@ const SessionMeetingExperience = ({
               },
             ]);
           })
-          .catch(() => {
+          .catch((err) => {
+            console.error("Chat fetch failed:", err);
             setChatbotMessages((prev) => [
               ...prev,
               {

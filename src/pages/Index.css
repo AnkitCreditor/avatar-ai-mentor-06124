@@ -294,7 +294,7 @@
   height: 40px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: var(--card);
+  background: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;
