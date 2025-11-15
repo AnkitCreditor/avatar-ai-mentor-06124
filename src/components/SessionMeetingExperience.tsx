@@ -1225,7 +1225,8 @@ const SessionMeetingExperience = ({
                         }
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
-                        className="min-h-[80px] resize-none bg-neutral-950/70 text-white"
+                        rows={3}
+                        className="h-20 resize-none overflow-y-auto bg-neutral-950/70 text-white focus-visible:ring-0 focus-visible:ring-offset-0"
                       />
                       <div className="flex items-center justify-between text-xs text-neutral-400">
                         <span>{displayName || "You"} {isMicOn ? "(mic on)" : "(mic muted)"}</span>
