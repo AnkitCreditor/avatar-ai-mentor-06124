@@ -203,6 +203,7 @@ const SessionMeetingExperience = ({
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
+  const displayVideoRef = useRef<HTMLVideoElement | null>(null);
   const stageVideoRef = useRef<HTMLVideoElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -640,19 +641,20 @@ const SessionMeetingExperience = ({
       }
 
       if (stream && isCameraOn) {
+        // Only set srcObject if it's different to avoid blinking
         if (video.srcObject !== stream) {
           video.srcObject = stream;
-        }
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => undefined);
+          video.play().catch(() => undefined);
         }
       } else {
-        video.srcObject = null;
+        if (video.srcObject !== null) {
+          video.srcObject = null;
+        }
       }
     };
 
     attachStream(previewVideoRef.current);
+    attachStream(displayVideoRef.current);
     attachStream(stageVideoRef.current);
   }, [localStream, isCameraOn, isJoined]);
 
@@ -836,19 +838,22 @@ const SessionMeetingExperience = ({
 
     return (
       <div className="relative h-full w-full bg-black flex items-center justify-center">
-        <video
-          autoPlay
-          playsInline
-          muted
-          className={shouldUseVirtualBackground && !virtualBackgroundError ? "hidden" : "h-full w-full object-cover"}
-          ref={(el) => {
-            if (el && localStream) {
-              el.srcObject = localStream;
-            }
-          }}
-        />
-        {shouldUseVirtualBackground && !virtualBackgroundError && (
-          <canvas ref={previewCanvasRef} className="h-full w-full object-cover" />
+        {/* When using virtual background, show canvas. Otherwise show video directly */}
+        {!shouldUseVirtualBackground || virtualBackgroundError ? (
+          <video
+            ref={displayVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="h-full w-full object-cover"
+            style={{ transform: 'scaleX(-1)' }}
+          />
+        ) : (
+          <canvas 
+            ref={previewCanvasRef} 
+            className="h-full w-full object-cover"
+            style={{ transform: 'scaleX(-1)' }}
+          />
         )}
         {isApplyingVirtualBackground && !backgroundTimeoutExceeded && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/80 text-center">
