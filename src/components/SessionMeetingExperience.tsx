@@ -202,6 +202,8 @@ const SessionMeetingExperience = ({
 
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
   const stageVideoRef = useRef<HTMLVideoElement | null>(null);
+  const sessionScrollAreaRef = useRef<HTMLElement | null>(null);
+  const chatbotScrollAreaRef = useRef<HTMLElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -1148,8 +1150,8 @@ const SessionMeetingExperience = ({
                       <video
                         ref={stageVideoRef}
                         className={`${shouldUseVirtualBackground && !virtualBackgroundError && !backgroundTimeoutExceeded
-                            ? "hidden"
-                            : "h-full w-full object-cover"
+                          ? "hidden"
+                          : "h-full w-full object-cover"
                           }`}
                         muted
                         playsInline
@@ -1463,144 +1465,143 @@ const SessionMeetingExperience = ({
                   </div>
                 ) : activePanel === "chat" ? (
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4">
-                    <TabsList className="flex-shrink-0 grid grid-cols-3 rounded-full bg-white/10 p-1 text-xs">
-                      <TabsTrigger value="session-chat" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
-                        Session
-                      </TabsTrigger>
-                      <TabsTrigger value="chatbot" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
-                        AI Tutor
-                      </TabsTrigger>
-                      <TabsTrigger value="resources" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
-                        Resources
-                      </TabsTrigger>
-                    </TabsList>
+                      <TabsList className="flex-shrink-0 grid grid-cols-3 rounded-full bg-white/10 p-1 text-xs">
+                        <TabsTrigger value="session-chat" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
+                          Session
+                        </TabsTrigger>
+                        <TabsTrigger value="chatbot" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
+                          AI Tutor
+                        </TabsTrigger>
+                        <TabsTrigger value="resources" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
+                          Resources
+                        </TabsTrigger>
+                      </TabsList>
 
-                    <div className="mt-4 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
-                      <TabsContent value="session-chat" className="h-full">
-                        <ScrollArea className="h-full px-4 py-4 overflow-y-auto">
-                          <div className="flex h-full flex-col-reverse gap-4">
-                            {[...sessionChat].map((message) => (
-                              <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
-                                <div
-                                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${message.source === "participant"
-                                    ? "bg-primary/90 text-primary-foreground shadow-md"
-                                    : message.source === "instructor"
-                                      ? "bg-neutral-800 text-white shadow-sm"
-                                      : "bg-neutral-700 text-white"
+                      <div className="mt-4 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
+                        <TabsContent value="session-chat" className="h-full">
+                          <ScrollArea ref={sessionScrollAreaRef as any} className="h-full px-4 py-4 overflow-y-auto">
+                            <div className="flex h-full flex-col gap-4">
+                              {sessionChat.map((message) => (
+                                <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
+                                  <div
+                                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
+                                      message.source === "participant"
+                                        ? "bg-primary/90 text-primary-foreground shadow-md"
+                                        : message.source === "instructor"
+                                        ? "bg-neutral-800 text-white shadow-sm"
+                                        : "bg-neutral-700 text-white"
                                     }`}
-                                >
-                                  <p className="font-medium">{message.sender}</p>
-                                  <p>{message.message}</p>
-                                  <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
+                                  >
+                                    <p className="font-medium">{message.sender}</p>
+                                    <p>{message.message}</p>
+                                    <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </TabsContent>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </TabsContent>
 
-                      <TabsContent value="chatbot" className="h-full">
-                        <ScrollArea className="h-full px-1 py-1 overflow-y-auto">
-                          <div className="flex h-full flex-col-reverse gap-4">
-                            {[...chatbotMessages].map((message) => (
-                              <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
-                                <div
-                                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${message.source === "participant"
-                                    ? "bg-primary/90 text-primary-foreground shadow-md"
-                                    : "bg-neutral-700 text-white"
+                        <TabsContent value="chatbot" className="h-full">
+                          <ScrollArea ref={chatbotScrollAreaRef as any} className="h-full px-4 py-4 overflow-y-auto">
+                            <div className="flex h-full flex-col gap-4">
+                              {chatbotMessages.map((message) => (
+                                <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
+                                  <div
+                                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
+                                      message.source === "participant"
+                                        ? "bg-primary/90 text-primary-foreground shadow-md"
+                                        : "bg-neutral-700 text-white"
                                     }`}
-                                >
-                                  <p className="flex items-center gap-2 font-medium">
-                                    {message.source === "bot" && <Bot className="h-3 w-3" />}
-                                    {message.sender}
-                                  </p>
-                                  <p>{message.message}</p>
-                                  <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
+                                  >
+                                    <p className="flex items-center gap-2 font-medium">
+                                      {message.source === "bot" && <Bot className="h-3 w-3" />}
+                                      {message.sender}
+                                    </p>
+                                    <p>{message.message}</p>
+                                    <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </TabsContent>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </TabsContent>
 
-                      <TabsContent value="resources" className="h-full">
-                        <div className="flex h-full flex-col gap-3 px-5 py-4 text-sm overflow-y-auto">
-                          <div>
-                            <p className="font-medium text-white">Lesson Materials</p>
-                            <p className="text-neutral-400">Slides, worksheets, and recordings will appear here.</p>
+                        <TabsContent value="resources" className="h-full">
+                          <div className="flex h-full flex-col gap-3 px-5 py-4 text-sm overflow-y-auto">
+                            <div>
+                              <p className="font-medium text-white">Lesson Materials</p>
+                              <p className="text-neutral-400">Slides, worksheets, and recordings will appear here.</p>
+                            </div>
+                            <ul className="list-inside list-disc space-y-1 text-neutral-400">
+                              <li>Interactive whiteboard snapshots</li>
+                              <li>Recommended follow-up practice</li>
+                              <li>Session transcript (auto-generated)</li>
+                            </ul>
                           </div>
-                          <ul className="list-inside list-disc space-y-1 text-neutral-400">
-                            <li>Interactive whiteboard snapshots</li>
-                            <li>Recommended follow-up practice</li>
-                            <li>Session transcript (auto-generated)</li>
-                          </ul>
-                        </div>
-                      </TabsContent>
-                    </div>
-
-                    <div className="sticky bottom-0 bg-neutral-900 mt-4 flex-shrink-0 rounded-2xl border border-white/10 px-4 py-4 shadow-lg">
-                      <form onSubmit={handleSendMessage} className="flex flex-col gap-2">
-                        <Textarea
-                          placeholder={
-                            activeTab === "chatbot" ? "Ask the AI tutor a quick question..." : "Share an update or ask the group something..."
-                          }
-                          value={chatInput}
-                          onChange={(e) => setChatInput(e.target.value)}
-                          rows={3}
-                          className="h-20 resize-none overflow-y-auto bg-neutral-950/70 text-white focus-visible:ring-0 focus-visible:ring-offset-0"
-                        />
-                        <div className="flex items-center justify-between text-xs text-neutral-400">
-                          <span>{displayName || "You"} {isMicOn ? "(mic on)" : "(mic muted)"}</span>
-                          <Button type="submit" size="sm" className="gap-2 rounded-full bg-primary px-4 text-white hover:bg-primary/90">
-                            <MessageSquare className="h-4 w-4" />
-                            Send
-                          </Button>
-                        </div>
-                      </form>
-                    </div>
-                  </Tabs>
-                ) : (
-                  <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
-                    <div className="rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
-                      <h4 className="text-base font-semibold">Meeting details</h4>
-                      <p className="mt-2 text-xs text-neutral-400">Share these details with anyone who needs to join.</p>
-                      <div className="mt-4 space-y-2 text-xs">
-                        <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
-                          <span className="font-semibold text-neutral-100">Course</span>
-                          <span className="text-neutral-300">{courseTitle}</span>
-                        </div>
-                        <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
-                          <span className="font-semibold text-neutral-100">Elapsed</span>
-                          <span className="text-neutral-300">00:12</span>
-                        </div>
-                        <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
-                          <span className="font-semibold text-neutral-100">Meeting ID</span>
-                          <span className="text-neutral-300">{sessionId ?? "Shared link"}</span>
-                        </div>
+                        </TabsContent>
                       </div>
-                      <Button
-                        variant="secondary"
-                        className="mt-4 w-full justify-center rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
-                        onClick={handleCopyLink}
-                      >
-                        <Share2 className="mr-2 h-4 w-4" />
-                        Copy invite link
-                      </Button>
+
+                      <div className="sticky bottom-0 bg-neutral-900 mt-4 flex-shrink-0 rounded-2xl border border-white/10 px-4 py-4 shadow-lg">
+                        <form onSubmit={handleSendMessage} className="flex flex-col gap-2">
+                          <Textarea
+                            placeholder={activeTab === "chatbot" ? "Ask the AI tutor a quick question..." : "Share an update or ask the group something..."}
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            rows={3}
+                            className="h-20 resize-none overflow-y-auto bg-neutral-950/70 text-white focus-visible:ring-0 focus-visible:ring-offset-0" />
+                          <div className="flex items-center justify-between text-xs text-neutral-400">
+                            <span>{displayName || "You"} {isMicOn ? "(mic on)" : "(mic muted)"}</span>
+                            <Button type="submit" size="sm" className="gap-2 rounded-full bg-primary px-4 text-white hover:bg-primary/90">
+                              <MessageSquare className="h-4 w-4" />
+                              Send
+                            </Button>
+                          </div>
+                        </form>
+                      </div>
+                    </Tabs>
+            ) : (
+              <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
+                <div className="rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
+                  <h4 className="text-base font-semibold">Meeting details</h4>
+                  <p className="mt-2 text-xs text-neutral-400">Share these details with anyone who needs to join.</p>
+                  <div className="mt-4 space-y-2 text-xs">
+                    <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                      <span className="font-semibold text-neutral-100">Course</span>
+                      <span className="text-neutral-300">{courseTitle}</span>
                     </div>
-                    <div className="mt-4 rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
-                      <h4 className="text-base font-semibold">Participants overview</h4>
-                      <p className="mt-2 text-xs text-neutral-400">
-                        {participantCount}+ learners connected. Use the chat to collaborate in real-time.
-                      </p>
+                    <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                      <span className="font-semibold text-neutral-100">Elapsed</span>
+                      <span className="text-neutral-300">00:12</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                      <span className="font-semibold text-neutral-100">Meeting ID</span>
+                      <span className="text-neutral-300">{sessionId ?? "Shared link"}</span>
                     </div>
                   </div>
-                )}
-              </motion.aside>
-            ) : null}
-          </AnimatePresence>
-        </main>
-      </div>
-      {backgroundDialog}
+                  <Button
+                    variant="secondary"
+                    className="mt-4 w-full justify-center rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
+                    onClick={handleCopyLink}
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Copy invite link
+                  </Button>
+                </div>
+                <div className="mt-4 rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
+                  <h4 className="text-base font-semibold">Participants overview</h4>
+                  <p className="mt-2 text-xs text-neutral-400">
+                    {participantCount}+ learners connected. Use the chat to collaborate in real-time.
+                  </p>
+                </div>
+              </div>
+            )}
+          </motion.aside>
+        ) : null}
+        </AnimatePresence>
+      </main>
+    </div>
+    {backgroundDialog}
     </>
   );
 };
