@@ -27,6 +27,10 @@ import {
   Users,
   Video,
   VideoOff,
+  Heart,
+  ThumbsUp,
+  PartyPopper,
+  Sparkles,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getBaseOrigin } from "@/lib/sessionStorage";
@@ -37,6 +41,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type ChatMessage = {
   id: string;
@@ -114,7 +129,7 @@ const SessionMeetingExperience = ({
   const { toast } = useToast();
   const [displayName, setDisplayName] = useState("Guest Learner");
   const [isJoined, setIsJoined] = useState(false);
-  const [isMicOn, setIsMicOn] = useState(true);
+  const [isMicOn, setIsMicOn] = useState(false); // Muted by default
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [showCaptions, setShowCaptions] = useState(false);
   const [activeTab, setActiveTab] = useState("session-chat");
@@ -128,7 +143,13 @@ const SessionMeetingExperience = ({
   const [backgroundTimeoutExceeded, setBackgroundTimeoutExceeded] = useState(false);
   const [customBackground, setCustomBackground] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [activePanel, setActivePanel] = useState<"chat" | "info" | null>(null);
+  const [activePanel, setActivePanel] = useState<"chat" | "info" | "participants" | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [isHandRaised, setIsHandRaised] = useState(false);
+  const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
+  const [showReactionsMenu, setShowReactionsMenu] = useState(false);
+  const [showMoreOptionsMenu, setShowMoreOptionsMenu] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     if (typeof document === "undefined") {
@@ -501,7 +522,7 @@ const SessionMeetingExperience = ({
     }
   };
 
-  const openPanel = (panel: "chat" | "info") => {
+  const openPanel = (panel: "chat" | "info" | "participants") => {
     setActivePanel(panel);
     setShowModal(true);
   };
@@ -509,6 +530,25 @@ const SessionMeetingExperience = ({
   const closePanel = () => {
     setShowModal(false);
     setActivePanel(null);
+  };
+
+  const handleReaction = (reaction: string) => {
+    setSelectedReaction(reaction);
+    setShowReactionsMenu(false);
+    toast({
+      title: "Reaction sent",
+      description: `You reacted with ${reaction}`,
+    });
+    // Clear reaction after 3 seconds
+    setTimeout(() => setSelectedReaction(null), 3000);
+  };
+
+  const handleRaiseHand = () => {
+    setIsHandRaised(!isHandRaised);
+    toast({
+      title: isHandRaised ? "Hand lowered" : "Hand raised",
+      description: isHandRaised ? "Your hand has been lowered" : "Your hand is now raised",
+    });
   };
 
   const stopStream = (stream: MediaStream | null) => {
@@ -625,13 +665,49 @@ const SessionMeetingExperience = ({
 
   const participantCount = useMemo(() => (isJoined ? 32 : 0), [isJoined]);
 
+  // Format elapsed time as MM:SS
+  const formatElapsedTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Get first letter of display name
+  const getInitials = (name: string) => {
+    return name.charAt(0).toUpperCase();
+  };
+
   const handleJoinSession = () => {
     setIsJoined(true);
   };
 
+  // Timer effect
+  useEffect(() => {
+    if (!isJoined) {
+      setElapsedTime(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setElapsedTime((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isJoined]);
+
+  // Update current time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleLeaveSession = () => {
     setIsJoined(false);
     setShowCaptions(false);
+    setElapsedTime(0);
   };
 
   const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {
@@ -708,41 +784,43 @@ const SessionMeetingExperience = ({
       );
     }
 
+    // For preview, just show a video element with the stream or the processed canvas
+    if (!localStream) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-3 bg-background/80 text-center">
+          <VideoOff className="h-10 w-10 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">Camera is turned off</p>
+        </div>
+      );
+    }
+
     return (
-      <div className="relative h-full w-full">
+      <div className="relative h-full w-full bg-black flex items-center justify-center">
         <video
-          ref={previewVideoRef}
-          className={`${
-            shouldUseVirtualBackground && !virtualBackgroundError && !backgroundTimeoutExceeded
-              ? "hidden"
-              : "h-full w-full object-cover"
-          }`}
-          muted
-          playsInline
           autoPlay
+          playsInline
+          muted
+          className={shouldUseVirtualBackground && !virtualBackgroundError ? "hidden" : "h-full w-full object-cover"}
+          ref={(el) => {
+            if (el && localStream) {
+              el.srcObject = localStream;
+            }
+          }}
         />
-        {shouldUseVirtualBackground && !virtualBackgroundError ? (
-          <>
-            <canvas ref={previewCanvasRef} className="h-full w-full object-cover" />
-            {(!hasRenderedVirtualBackgroundFrame || isApplyingVirtualBackground) && !backgroundTimeoutExceeded && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/80 text-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm font-medium text-foreground">Applying your background…</p>
-              </div>
-            )}
-          </>
-        ) : null}
-        {virtualBackgroundError ? (
+        {shouldUseVirtualBackground && !virtualBackgroundError && (
+          <canvas ref={previewCanvasRef} className="h-full w-full object-cover" />
+        )}
+        {isApplyingVirtualBackground && !backgroundTimeoutExceeded && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/80 text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm font-medium text-foreground">Applying your background…</p>
+          </div>
+        )}
+        {virtualBackgroundError && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 p-4 text-center text-sm text-destructive">
             {virtualBackgroundError}
           </div>
-        ) : backgroundTimeoutExceeded ? (
-          <div className="absolute inset-x-0 bottom-0 flex justify-center p-3">
-            <div className="rounded-md bg-background/85 px-3 py-2 text-xs text-muted-foreground shadow">
-              Showing your camera without the virtual background while we keep trying to render it.
-            </div>
-          </div>
-        ) : null}
+        )}
       </div>
     );
   })();
@@ -827,6 +905,14 @@ const SessionMeetingExperience = ({
                 <Upload className="h-4 w-4" />
                 Upload background image
               </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-sm text-muted-foreground hover:bg-muted"
+                onClick={() => handleBackgroundSelection(null)}
+              >
+                Remove virtual background
+              </Button>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -844,8 +930,18 @@ const SessionMeetingExperience = ({
   if (!isJoined) {
     return (
       <>
-        <Card className="overflow-hidden border border-border">
-          <div className="grid gap-6 p-6 lg:grid-cols-[2fr_1fr]">
+        {/* Hidden video element for virtual background processing */}
+        <div className="hidden">
+          <video
+            ref={previewVideoRef}
+            muted
+            playsInline
+            autoPlay
+          />
+        </div>
+
+        <div className="h-screen w-screen overflow-hidden bg-background">
+          <div className="grid gap-6 p-6 lg:grid-cols-[2fr_1fr] h-full">
             <div className="space-y-4">
               <div
                 className="relative mx-auto aspect-video w-full max-w-4xl overflow-hidden rounded-[28px] border border-border bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 shadow-2xl"
@@ -932,20 +1028,31 @@ const SessionMeetingExperience = ({
               </div>
             </div>
           </div>
-        </Card>
+        </div>
         {backgroundDialog}
       </>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-neutral-900 text-neutral-50">
-      <main className="relative flex flex-1 overflow-hidden">
+    <>
+      {/* Hidden video element for virtual background processing */}
+      <div className="hidden">
+        <video
+          ref={previewVideoRef}
+          muted
+          playsInline
+          autoPlay
+        />
+      </div>
+
+      <div className="flex h-screen w-screen flex-col bg-neutral-900 text-neutral-50 overflow-hidden">
+        <main className="relative flex flex-1 overflow-hidden h-full w-full">
         <motion.section
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="relative flex flex-1 overflow-hidden bg-black"
+          className="relative flex flex-1 overflow-hidden bg-black h-full w-full"
         >
           <video
             className="absolute inset-0 h-full w-full object-cover"
@@ -969,6 +1076,17 @@ const SessionMeetingExperience = ({
                   Live
                 </div>
                 
+                {/* Reaction indicator */}
+                {selectedReaction && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1, y: -20 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    className="text-4xl"
+                  >
+                    {selectedReaction}
+                  </motion.div>
+                )}
               </div>
 
               <div >
@@ -987,89 +1105,257 @@ const SessionMeetingExperience = ({
                 <div />
               )}
 
-              {isCameraOn && localStream ? (
-                <div className="h-32 w-32 overflow-hidden rounded-2xl border border-white/20 bg-black/80 shadow-2xl backdrop-blur">
-                  <video ref={stageVideoRef} className="h-full w-full object-cover" muted playsInline autoPlay />
-                </div>
-              ) : null}
+              {/* User video preview - show first letter when camera is off */}
+              <div className="h-32 w-32 overflow-hidden rounded-2xl border border-white/20 bg-black/80 shadow-2xl backdrop-blur flex items-center justify-center">
+                {isCameraOn && localStream ? (
+                  <div className="relative h-full w-full">
+                    <video
+                      ref={stageVideoRef}
+                      className={`${
+                        shouldUseVirtualBackground && !virtualBackgroundError && !backgroundTimeoutExceeded
+                          ? "hidden"
+                          : "h-full w-full object-cover"
+                      }`}
+                      muted
+                      playsInline
+                      autoPlay
+                    />
+                    {shouldUseVirtualBackground && !virtualBackgroundError ? (
+                      <canvas ref={stageCanvasRef} className="absolute inset-0 h-full w-full object-cover" />
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center bg-neutral-800 text-center">
+                    <span className="text-4xl font-semibold text-white">
+                      {getInitials(displayName)}
+                    </span>
+                    <span className="mt-1 text-[11px] uppercase tracking-wide text-neutral-300">
+                      {isCameraOn ? "Camera unavailable" : "Camera off"}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="border-t border-white/10 bg-neutral-900/95 px-6 py-2">
+            <div className="border-t border-white/10 bg-neutral-900/95">
               {showCaptions && (
                 <div className="mx-auto mb-3 max-w-xl rounded-full bg-black/70 px-5 py-2 text-center text-xs font-medium text-white shadow-lg backdrop-blur">
                   {currentCaption}
                 </div>
               )}
 
-              <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-2 text-xs">
-                <Button
-                  variant="secondary"
-                  className={`flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-white hover:bg-white/20 ${
-                    activePanel === "chat" && showModal ? "!bg-white/25" : ""
-                  }`}
-                  onClick={() =>
-                    showModal && activePanel === "chat" ? closePanel() : openPanel("chat")
-                  }
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Chat
-                </Button>
+              {/* Google Meet style control bar */}
+              <div className="flex items-center justify-between px-6 py-3">
+                {/* Left section - Time and Meeting ID */}
+                <div className="flex items-center gap-3 text-sm text-white">
+                  <span>{currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                  <div className="h-4 w-px bg-white/30" />
+                  <span className="font-mono text-xs">{sessionId ?? "zah-geqs-xrx"}</span>
+                </div>
 
-                <Button
-                  variant={isMicOn ? "secondary" : "destructive"}
-                  size="icon"
-                  className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
-                  onClick={() => setIsMicOn((prev) => !prev)}
-                >
-                  {isMicOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-                </Button>
+                {/* Center section - Main controls */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
+                    onClick={() => setIsCameraOn((prev) => !prev)}
+                    title={isCameraOn ? "Turn off camera" : "Turn on camera"}
+                  >
+                    {isCameraOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
+                  </Button>
 
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${showCaptions ? "!bg-white/30" : ""}`}
-                  onClick={() => setShowCaptions((prev) => !prev)}
-                >
-                  <CaptionsIcon className="h-5 w-5" />
-                </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
+                    onClick={() => setIsBackgroundModalOpen(true)}
+                    title="Change background"
+                  >
+                    <ImageIcon className="h-5 w-5" />
+                  </Button>
 
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${
-                    activePanel === "info" && showModal ? "!bg-white/30" : ""
-                  }`}
-                  onClick={() =>
-                    showModal && activePanel === "info" ? closePanel() : openPanel("info")
-                  }
-                >
-                  <Info className="h-5 w-5" />
-                </Button>
+                  <Popover open={showReactionsMenu} onOpenChange={setShowReactionsMenu}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${selectedReaction ? "!bg-white/30" : ""}`}
+                        title="Send a reaction"
+                      >
+                        <Smile className="h-5 w-5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2 bg-neutral-800 border-white/10">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-full hover:bg-white/20"
+                          onClick={() => handleReaction("👍")}
+                          title="Thumbs up"
+                        >
+                          <ThumbsUp className="h-5 w-5 text-white" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-full hover:bg-white/20"
+                          onClick={() => handleReaction("❤️")}
+                          title="Heart"
+                        >
+                          <Heart className="h-5 w-5 text-white" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-full hover:bg-white/20"
+                          onClick={() => handleReaction("✨")}
+                          title="Cheer"
+                        >
+                          <Sparkles className="h-5 w-5 text-white" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-full hover:bg-white/20"
+                          onClick={() => handleReaction("🎉")}
+                          title="Party"
+                        >
+                          <PartyPopper className="h-5 w-5 text-white" />
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
 
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
-                >
-                  <Hand className="h-5 w-5" />
-                </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${showCaptions ? "!bg-white/30" : ""}`}
+                    onClick={() => setShowCaptions((prev) => !prev)}
+                    title={showCaptions ? "Hide captions" : "Show captions"}
+                  >
+                    <CaptionsIcon className="h-5 w-5" />
+                  </Button>
 
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
-                >
-                  <Smile className="h-5 w-5" />
-                </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${isHandRaised ? "!bg-white/30" : ""}`}
+                    onClick={handleRaiseHand}
+                    title={isHandRaised ? "Lower hand" : "Raise hand"}
+                  >
+                    <Hand className="h-5 w-5" />
+                  </Button>
 
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="h-10 w-10 rounded-full bg-red-600 text-white hover:bg-red-500"
-                  onClick={handleLeaveSession}
-                >
-                  <PhoneOff className="h-5 w-5" />
-                </Button>
+                  <DropdownMenu open={showMoreOptionsMenu} onOpenChange={setShowMoreOptionsMenu}>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
+                        title="More options"
+                      >
+                        <span className="text-lg">⋯</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-neutral-800 border-white/10 text-white">
+                      <DropdownMenuItem
+                        className="cursor-pointer hover:bg-white/10"
+                        onClick={() => {
+                          setShowMoreOptionsMenu(false);
+                          toast({
+                            title: "Settings",
+                            description: "Settings panel coming soon",
+                          });
+                        }}
+                      >
+                        Settings
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer hover:bg-white/10"
+                        onClick={() => {
+                          setShowMoreOptionsMenu(false);
+                          toast({
+                            title: "Keyboard shortcuts",
+                            description: "Press '?' to see all shortcuts",
+                          });
+                        }}
+                      >
+                        Keyboard shortcuts
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer hover:bg-white/10"
+                        onClick={() => {
+                          setShowMoreOptionsMenu(false);
+                          handleCopyLink();
+                        }}
+                      >
+                        Copy meeting link
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="h-10 w-10 rounded-full bg-red-600 text-white hover:bg-red-500"
+                    onClick={handleLeaveSession}
+                    title="Leave meeting"
+                  >
+                    <PhoneOff className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                {/* Right section - Additional controls */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${
+                      activePanel === "info" && showModal ? "!bg-white/30" : ""
+                    }`}
+                    onClick={() =>
+                      showModal && activePanel === "info" ? closePanel() : openPanel("info")
+                    }
+                    title="Meeting information"
+                  >
+                    <Info className="h-5 w-5" />
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 relative ${
+                      activePanel === "participants" && showModal ? "!bg-white/30" : ""
+                    }`}
+                    onClick={() =>
+                      showModal && activePanel === "participants" ? closePanel() : openPanel("participants")
+                    }
+                    title="Participants"
+                  >
+                    <Users className="h-5 w-5" />
+                    {participantCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-neutral-700 text-xs flex items-center justify-center text-white">
+                        {participantCount}
+                      </span>
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${
+                      activePanel === "chat" && showModal ? "!bg-white/30" : ""
+                    }`}
+                    onClick={() =>
+                      showModal && activePanel === "chat" ? closePanel() : openPanel("chat")
+                    }
+                    title="Chat"
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -1087,10 +1373,14 @@ const SessionMeetingExperience = ({
               <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
                 <div>
                   <h3 className="text-base font-semibold">
-                    {activePanel === "chat" ? "Collaboration" : "Meeting info"}
+                    {activePanel === "chat" ? "Collaboration" : activePanel === "participants" ? "Participants" : "Meeting info"}
                   </h3>
                   <p className="text-xs text-neutral-400">
-                    {activePanel === "chat" ? "Chat, AI tutor, and resources" : "Share details with participants"}
+                    {activePanel === "chat" 
+                      ? "Chat, AI tutor, and resources" 
+                      : activePanel === "participants"
+                      ? `${participantCount} participants in this meeting`
+                      : "Share details with participants"}
                   </p>
                 </div>
                 <Button size="sm" variant="ghost" className="rounded-full px-3 text-neutral-300 hover:bg-white/10" onClick={closePanel}>
@@ -1098,7 +1388,48 @@ const SessionMeetingExperience = ({
                 </Button>
               </div>
 
-              {activePanel === "chat" ? (
+              {activePanel === "participants" ? (
+                <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
+                  <ScrollArea className="flex-1">
+                    <div className="space-y-2">
+                      {/* Current user */}
+                      <div className="flex items-center gap-3 rounded-lg bg-neutral-800/50 p-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white font-semibold">
+                          {getInitials(displayName)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-white">{displayName}</p>
+                          <p className="text-xs text-neutral-400">You</p>
+                        </div>
+                        {isHandRaised && (
+                          <div className="rounded-full bg-yellow-500/20 px-2 py-1 text-xs text-yellow-300">
+                            ✋ Hand raised
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Other participants (simulated) */}
+                      {participantCount === 0 ? (
+                        <div className="rounded-lg border border-dashed border-white/10 p-4 text-center text-xs text-neutral-400">
+                          Waiting for others to join…
+                        </div>
+                      ) : (
+                        Array.from({ length: Math.min(Math.max(participantCount - 1, 0), 10) }).map((_, idx) => (
+                          <div key={idx} className="flex items-center gap-3 rounded-lg bg-neutral-800/50 p-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-600 text-white font-semibold">
+                              {String.fromCharCode(65 + (idx % 26))}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium text-white">Participant {idx + 1}</p>
+                              <p className="text-xs text-neutral-400">Guest</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
+              ) : activePanel === "chat" ? (
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4">
                   <TabsList className="flex-shrink-0 grid grid-cols-3 rounded-full bg-white/10 p-1 text-xs">
                     <TabsTrigger value="session-chat" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
@@ -1236,8 +1567,10 @@ const SessionMeetingExperience = ({
             </motion.aside>
           ) : null}
         </AnimatePresence>
-      </main>
-    </div>
+        </main>
+      </div>
+      {backgroundDialog}
+    </>
   );
 };
 
