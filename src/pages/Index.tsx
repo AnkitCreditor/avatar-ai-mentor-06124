@@ -170,7 +170,17 @@ const Index = () => {
   const scrollBy = (container: HTMLDivElement | null, dir: number) => {
     if (!container) return;
     const amount = dir * (CARD_WIDTH + GAP);
-    container.scrollBy({ left: amount, behavior: "smooth" });
+     // Get the max scrollable width
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    
+    // Only scroll if there's more content to scroll
+    if (container.scrollLeft + amount > maxScroll) {
+      container.scrollLeft = maxScroll;
+    } else if (container.scrollLeft + amount < 0) {
+      container.scrollLeft = 0;
+    } else {
+      container.scrollBy({ left: amount, behavior: "smooth" });
+    }
   };
 
   const renderEmblaCarousel = (items: SessionRecord[], ref?: React.RefObject<HTMLDivElement>) => {
