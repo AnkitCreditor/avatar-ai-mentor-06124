@@ -1155,8 +1155,8 @@ const SessionMeetingExperience = ({
                   <div className="mt-4 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
                     <TabsContent value="session-chat" className="h-full">
                       <ScrollArea className="h-full px-4 py-4">
-                        <div className="space-y-4">
-                          {sessionChat.map((message) => (
+                        <div className="flex h-full flex-col-reverse gap-4">
+                          {[...sessionChat].map((message) => (
                             <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
                               <div
                                 className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
@@ -1179,8 +1179,8 @@ const SessionMeetingExperience = ({
 
                     <TabsContent value="chatbot" className="h-full">
                       <ScrollArea className="h-full px-1 py-1">
-                        <div className="space-y-4">
-                          {chatbotMessages.map((message) => (
+                        <div className="flex h-full flex-col-reverse gap-4">
+                          {[...chatbotMessages].map((message) => (
                             <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
                               <div
                                 className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
