@@ -229,10 +229,11 @@
   content: "";
   position: absolute;
   top: 0;
-  width: 60px;
+  width: 40px;
   height: 100%;
   pointer-events: none;
   z-index: 3;
+  opacity: 0.8;
 }
 
 .scroller-wrapper::before {
@@ -252,6 +253,7 @@
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   padding-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .card-scroller::-webkit-scrollbar {
@@ -265,15 +267,21 @@
 .card-scroller-item {
   scroll-snap-align: start;
   flex-shrink: 0;
+  width: 320px;
+  min-width: 320px;
+  height: 100%;
 }
 
 /* enforce uniform card height and ensure cards occupy full item area */
 .card-scroller-item {
   align-items: stretch;
+  display: flex;
 }
 
 .card-scroller-item .carousel-card {
-  height: 280px; /* slightly reduced to remove excess bottom space */
+  min-height: 300px;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -299,8 +307,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: 0.2s ease;
-  opacity: 0; /* hidden until hover */
+  transition: all 0.2s ease;
+  opacity: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .scroller-wrapper:hover .scroller-nav {
@@ -319,27 +328,103 @@
   transform: translateY(-50%) scale(1.1);
   background: var(--accent);
   color: var(--accent-foreground);
-}
-
-@media (max-width: 600px) {
-  .scroller-prev {
-    left: 0;
-  }
-  .scroller-next {
-    right: 0;
-  }
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .scroller-nav:active {
   transform: translateY(-50%) scale(0.98);
 }
 
+/* Mobile Responsive Styles */
+@media (max-width: 1024px) {
+  .scroller-wrapper::before,
+  .scroller-wrapper::after {
+    width: 20px;
+  }
+  
+  .scroller-nav {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .scroller-prev {
+    left: 4px;
+  }
+  
+  .scroller-next {
+    right: 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .scroller-wrapper {
+    padding: 8px 0;
+  }
+  
+  .scroller-wrapper::before,
+  .scroller-wrapper::after {
+    width: 15px;
+  }
+  
+  .card-scroller {
+    gap: 12px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  
+  .card-scroller-item {
+    width: 280px;
+    min-width: 280px;
+  }
+  
+  .card-scroller-item .carousel-card {
+    min-height: 290px;
+  }
+  
+  .scroller-nav {
+    width: 32px;
+    height: 32px;
+    opacity: 0.7;
+  }
+  
+  .scroller-wrapper:hover .scroller-nav,
+  .scroller-wrapper:active .scroller-nav {
+    opacity: 0.9;
+  }
+  
+  .scroller-prev {
+    left: 2px;
+  }
+  
+  .scroller-next {
+    right: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-scroller-item {
+    width: 260px;
+    min-width: 260px;
+  }
+  
+  .card-scroller-item .carousel-card {
+    min-height: 280px;
+  }
+  
+  .scroller-nav {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 /* ensure headings stay fixed and don't shift when scroller moves */
-.scroller-wrapper + h2, .scroller-wrapper + p {
+.scroller-wrapper + h2, 
+.scroller-wrapper + p {
   position: relative;
 }
 
 /* Prevent any horizontal page-level scroll that could show a bottom scrollbar */
 html, body {
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }

@@ -18,13 +18,13 @@ const ManageCourses = () => {
   ]);
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 pt-16 lg:pt-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Manage Courses</h1>
-          <p className="text-muted-foreground">Create and manage virtual instructor courses</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Manage Courses</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Create and manage virtual instructor courses</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2 w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           Create New Course
         </Button>
@@ -43,7 +43,7 @@ const ManageCourses = () => {
             <Label htmlFor="description">Description</Label>
             <Textarea id="description" placeholder="Enter course description" rows={3} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Input id="category" placeholder="e.g., Science, Math" />
@@ -64,26 +64,26 @@ const ManageCourses = () => {
         <CardContent>
           <div className="space-y-4">
             {courses.map((course) => (
-              <div key={course.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+              <div key={course.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <h3 className="font-semibold text-foreground">{course.name}</h3>
                     <Badge variant={course.status === "Active" ? "default" : "secondary"}>
                       {course.status}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
                       {course.students} students
                     </span>
-                    <span>•</span>
+                    <span className="hidden sm:inline">•</span>
                     <span>{course.sessions} sessions</span>
-                    <span>•</span>
+                    <span className="hidden sm:inline">•</span>
                     <span>{course.instructor}</span>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-end">
                   <Button size="sm" variant="outline">
                     <Edit className="h-4 w-4" />
                   </Button>

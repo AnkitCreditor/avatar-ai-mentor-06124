@@ -4,7 +4,8 @@ import Sidebar from "@/components/Sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Clock, CalendarDays, Video, Copy, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Users, Clock, CalendarDays, Video, Copy, ChevronLeft, ChevronRight, Menu } from "lucide-react";
 import { loadSessions, SessionRecord } from "@/lib/sessionStorage";
 import { useToast } from "@/hooks/use-toast";
 import "./Index.css";
@@ -105,14 +106,19 @@ const Index = () => {
     const isJoinDisabled = session.status !== "Active";
 
     return (
-      <Card key={session.id} className="border border-border shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0 carousel-card flex flex-col"
-        style={{ width: '340px', height: '260px' }}
+      <Card 
+        key={session.id} 
+        className="border border-border shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0 carousel-card flex flex-col h-full"
       >
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-3 flex-shrink-0">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-base font-semibold text-foreground truncate">{session.course}</CardTitle>
-              <p className="text-xs text-muted-foreground truncate mt-1">{session.instructor}</p>
+              <CardTitle className="text-base font-semibold text-foreground truncate">
+                {session.course}
+              </CardTitle>
+              <p className="text-xs text-muted-foreground truncate mt-1">
+                {session.instructor}
+              </p>
             </div>
             <Badge
               variant={
@@ -122,39 +128,53 @@ const Index = () => {
                     ? "secondary"
                     : "outline"
               }
-              className="flex-shrink-0 text-xs"
+              className="flex-shrink-0 text-xs whitespace-nowrap"
             >
               {session.status}
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="pb-1 space-y-5 flex-1 text-xs text-muted-foreground">
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center gap-2">
-              <Users className="h-3.5 w-3.5 text-primary flex-shrink-0" />
-              <span className="truncate">{session.students} learners</span>
+        <CardContent className="pb-4 flex-1 flex flex-col justify-between gap-3">
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-2">
+                <Users className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                <span className="truncate text-xs">{session.students} learners</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                <span className="truncate text-xs">{session.duration}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-3.5 w-3.5 text-primary flex-shrink-0" />
-              <span className="truncate">{session.duration}</span>
+            {scheduledAt && (
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                <span className="truncate text-xs font-medium">{scheduledAt}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2 text-xs">
+              <span className="font-medium text-foreground">ID:</span>
+              <span className="font-mono text-xs text-muted-foreground truncate">
+                {session.meetingId}
+              </span>
             </div>
           </div>
-          {scheduledAt && (
-            <div className="flex items-center gap-2 pt-1">
-              <CalendarDays className="h-3.5 w-3.5 text-primary flex-shrink-0" />
-              <span className="truncate text-foreground text-xs">{scheduledAt}</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1 pt-1 text-xs">
-            <span className="font-medium text-foreground">ID:</span>
-            <span className="font-mono text-xs text-muted-foreground truncate">{session.meetingId}</span>
-          </div>
-          <div className="flex flex-col gap-2 pt-2">
-            <Button onClick={() => handleJoinSession(session)} size="sm" className="gap-1.5 text-xs h-8" disabled={isJoinDisabled}>
+          <div className="flex flex-col gap-2 mt-auto pt-2">
+            <Button 
+              onClick={() => handleJoinSession(session)} 
+              size="sm" 
+              className="w-full gap-1.5 text-xs h-9" 
+              disabled={isJoinDisabled}
+            >
               <Video className="h-3.5 w-3.5" />
               Join
             </Button>
-            <Button variant="outline" onClick={() => copySessionLink(session.shareLink)} size="sm" className="gap-1.5 text-xs h-8">
+            <Button 
+              variant="outline" 
+              onClick={() => copySessionLink(session.shareLink)} 
+              size="sm" 
+              className="w-full gap-1.5 text-xs h-9"
+            >
               <Copy className="h-3.5 w-3.5" />
               Copy Link
             </Button>
@@ -164,7 +184,7 @@ const Index = () => {
     );
   };
 
-  const CARD_WIDTH = 340; // px - should match CSS
+  const CARD_WIDTH = 320; // px - should match CSS
   const GAP = 16; // px gap between items
 
   const scrollBy = (container: HTMLDivElement | null, dir: number) => {
@@ -225,61 +245,78 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <div className="fixed left-0 top-0 h-full w-64">
+      {/* Sidebar - Hidden on mobile, visible on desktop */}
+      <div className="hidden lg:block fixed left-0 top-0 h-full w-64 z-20">
         <Sidebar />
       </div>
 
-      <main className="ml-64 flex-1 p-8">
-        <div className="mx-auto max-w-7xl space-y-8">
-          <header className="space-y-2">
-            <h1 className="text-3xl font-bold text-foreground">Virtual Instructor</h1>
-            <p className="text-muted-foreground">
+      {/* Mobile Sidebar */}
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="fixed top-4 left-4 z-30 lg:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-64">
+          <Sidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Main Content */}
+      <main className="flex-1 w-full lg:ml-64 p-4 sm:p-6 lg:p-8">
+        <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8">
+          {/* Header */}
+          <header className="space-y-2 mt-12 lg:mt-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Virtual Instructor</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Jump into live sessions, review upcoming classes, and stay ready for AI-powered instruction.
             </p>
           </header>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
-            <div className="space-y-6">
-              <section className="space-y-4">
-                <div>
-                  <h2 className="text-2xl font-semibold text-foreground">Live Sessions</h2>
-                  <p className="text-sm text-muted-foreground">Sessions currently in progress.</p>
-                </div>
-                {liveSessions.length > 0 ? (
-                  renderEmblaCarousel(liveSessions)
-                ) : (
-                  <Card className="border border-dashed border-border bg-muted/40 p-8 text-sm text-muted-foreground empty-state-card text-center">
-                    <p>No sessions are live right now. Check upcoming sessions or wait for an instructor to go live.</p>
-                  </Card>
-                )}
-              </section>
-
-              <section className="space-y-4">
-                <div>
-                  <h2 className="text-2xl font-semibold text-foreground">Upcoming Sessions</h2>
-                  <p className="text-sm text-muted-foreground">Join early to get your setup ready.</p>
-                </div>
-                {upcomingSessions.length > 0 ? (
-                  renderEmblaCarousel(upcomingSessions)
-                ) : (
-                  <Card className="border border-dashed border-border bg-muted/40 p-8 text-sm text-muted-foreground empty-state-card text-center">
-                    <p>No upcoming sessions scheduled yet. Check back soon or contact your instructor.</p>
-                  </Card>
-                )}
-              </section>
-            </div>
-
-          </div>
-
+          {/* Live Sessions Section */}
           <section className="space-y-4">
             <div>
-              <h2 className="text-2xl font-semibold text-foreground">Completed Sessions</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Live Sessions</h2>
+              <p className="text-sm text-muted-foreground">Sessions currently in progress.</p>
+            </div>
+            {liveSessions.length > 0 ? (
+              renderEmblaCarousel(liveSessions, liveRef)
+            ) : (
+              <Card className="border border-dashed border-border bg-muted/40 p-6 sm:p-8 text-sm text-muted-foreground empty-state-card text-center">
+                <p>No sessions are live right now. Check upcoming sessions or wait for an instructor to go live.</p>
+              </Card>
+            )}
+          </section>
+
+          {/* Upcoming Sessions Section */}
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Upcoming Sessions</h2>
+              <p className="text-sm text-muted-foreground">Join early to get your setup ready.</p>
+            </div>
+            {upcomingSessions.length > 0 ? (
+              renderEmblaCarousel(upcomingSessions, upcomingRef)
+            ) : (
+              <Card className="border border-dashed border-border bg-muted/40 p-6 sm:p-8 text-sm text-muted-foreground empty-state-card text-center">
+                <p>No upcoming sessions scheduled yet. Check back soon or contact your instructor.</p>
+              </Card>
+            )}
+          </section>
+
+          {/* Completed Sessions Section */}
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Completed Sessions</h2>
               <p className="text-sm text-muted-foreground">Catch up on classes you might have missed.</p>
             </div>
             {completedSessions.length > 0 ? (
-              renderEmblaCarousel(completedSessions)
+              renderEmblaCarousel(completedSessions, completedRef)
             ) : (
-              <Card className="border border-dashed border-border bg-muted/40 p-8 text-sm text-muted-foreground empty-state-card text-center">
+              <Card className="border border-dashed border-border bg-muted/40 p-6 sm:p-8 text-sm text-muted-foreground empty-state-card text-center">
                 <p>Completed sessions will appear here once your classes finish.</p>
               </Card>
             )}
