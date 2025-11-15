@@ -106,7 +106,7 @@ const Index = () => {
 
     return (
       <Card key={session.id} className="border border-border shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0 carousel-card flex flex-col"
-      style={{ width: '340px', height: '260px' }}
+        style={{ width: '340px', height: '260px' }}
       >
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-3">
@@ -170,9 +170,9 @@ const Index = () => {
   const scrollBy = (container: HTMLDivElement | null, dir: number) => {
     if (!container) return;
     const amount = dir * (CARD_WIDTH + GAP);
-     // Get the max scrollable width
+    // Get the max scrollable width
     const maxScroll = container.scrollWidth - container.clientWidth;
-    
+
     // Only scroll if there's more content to scroll
     if (container.scrollLeft + amount > maxScroll) {
       container.scrollLeft = maxScroll;
