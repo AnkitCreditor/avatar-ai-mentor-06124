@@ -10,9 +10,11 @@ import { useState } from "react";
 const ManageCourses = () => {
   const [courses] = useState([
     { id: 1, name: "Advanced Mathematics", instructor: "AI Instructor", students: 45, sessions: 12, status: "Active" },
-    { id: 2, name: "Physics 101", instructor: "AI Instructor", students: 38, sessions: 10, status: "Active" },
-    { id: 3, name: "Chemistry Basics", instructor: "AI Instructor", students: 52, sessions: 8, status: "Active" },
-    { id: 4, name: "Biology Fundamentals", instructor: "AI Instructor", students: 41, sessions: 0, status: "Draft" },
+    { id: 2, name: "English", instructor: "AI Instructor", students: 45, sessions: 12, status: "Active" },
+    { id: 3, name: "DILR", instructor: "AI Instructor", students: 45, sessions: 12, status: "Active" },
+    { id: 4, name: "Physics 101", instructor: "AI Instructor", students: 38, sessions: 10, status: "Active" },
+    { id: 5, name: "Chemistry Basics", instructor: "AI Instructor", students: 52, sessions: 8, status: "Active" },
+    { id: 6, name: "Biology Fundamentals", instructor: "AI Instructor", students: 41, sessions: 0, status: "Draft" },
   ]);
 
   return (

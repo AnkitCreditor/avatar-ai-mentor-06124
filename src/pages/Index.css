@@ -1,0 +1,345 @@
+/* Carousel Container */
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+}
+
+.carousel-content {
+  display: flex;
+  gap: 1rem;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.5rem 0;
+  perspective: 1200px;
+  align-items: stretch;
+}
+
+.carousel-item {
+  min-width: 320px;
+  max-width: 340px;
+  display: flex;
+  align-items: stretch;
+}
+
+/* Navigation Buttons */
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, hsl(217, 76%, 50%) 0%, hsl(217, 76%, 60%) 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(217, 76%, 50%, 0.25);
+}
+
+.carousel-nav:hover {
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 8px 20px rgba(217, 76%, 50%, 0.35);
+}
+
+.carousel-nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.carousel-nav-prev {
+  left: -24px;
+}
+
+.carousel-nav-next {
+  right: -24px;
+}
+
+/* Carousel Indicators */
+.carousel-indicators {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: hsl(215, 20%, 88%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.indicator:hover {
+  background-color: hsl(217, 76%, 70%);
+  transform: scale(1.25);
+}
+
+.indicator.active {
+  background: linear-gradient(135deg, hsl(217, 76%, 50%) 0%, hsl(217, 76%, 60%) 100%);
+  box-shadow: 0 0 0 3px rgba(217, 76%, 50%, 0.2);
+  width: 10px;
+  height: 10px;
+}
+
+.dark .indicator {
+  background-color: hsl(215, 25%, 18%);
+}
+
+.dark .indicator:hover {
+  background-color: hsl(217, 76%, 45%);
+}
+
+.dark .indicator.active {
+  background: linear-gradient(135deg, hsl(217, 76%, 55%) 0%, hsl(217, 76%, 70%) 100%);
+}
+
+/* Card animations on load */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.carousel-card {
+  animation: slideInUp 0.45s ease-out;
+}
+
+/* Professional card styling */
+.carousel-card {
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.36s ease, border-color 0.36s ease;
+  border-radius: 0.75rem;
+  will-change: transform;
+}
+
+.carousel-item .card {
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+  backface-visibility: hidden;
+}
+
+.carousel-item:hover .card,
+.carousel-item:focus-within .card {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 18px 36px rgba(17, 24, 39, 0.08);
+}
+
+.carousel-item .card {
+  transform: translateY(0) scale(1);
+}
+
+.dark .carousel-card:hover {
+  box-shadow: 0 12px 24px rgba(217, 76%, 55%, 0.15);
+}
+
+/* Section title styling */
+.section-title {
+  background: linear-gradient(135deg, hsl(217, 76%, 50%) 0%, hsl(217, 76%, 35%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.dark .section-title {
+  background: linear-gradient(135deg, hsl(217, 76%, 55%) 0%, hsl(217, 76%, 70%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Empty state styling */
+.empty-state-card {
+  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+}
+
+.empty-state-card:hover {
+  border-color: hsl(217, 76%, 50%);
+  background: hsl(217, 76%, 98%);
+}
+
+.dark .empty-state-card:hover {
+  background: hsl(217, 76%, 12%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .carousel-container {
+    margin: 0 -1rem;
+    border-radius: 0;
+    padding: 0 1rem;
+  }
+
+  .carousel-nav {
+    width: 36px;
+    height: 36px;
+  }
+
+  .carousel-nav-prev {
+    left: 0;
+  }
+
+  .carousel-nav-next {
+    right: 0;
+  }
+
+  .carousel-card {
+    width: 300px;
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-card {
+    width: 280px;
+    min-height: 240px;
+  }
+
+  .carousel-nav {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* New scroll-snap scroller styles */
+.scroller-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 10px 0;
+}
+
+.scroller-wrapper::before,
+.scroller-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 60px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.scroller-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, var(--background), transparent);
+}
+
+.scroller-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, var(--background), transparent);
+}
+
+.card-scroller {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 12px;
+}
+
+.card-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.card-scroller {
+  scrollbar-width: none;
+}
+
+.card-scroller-item {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* enforce uniform card height and ensure cards occupy full item area */
+.card-scroller-item {
+  align-items: stretch;
+}
+
+.card-scroller-item .carousel-card {
+  height: 280px; /* slightly reduced to remove excess bottom space */
+  display: flex;
+  flex-direction: column;
+}
+
+/* internal layout uses existing card component classes; no extra rules needed here */
+
+/* better touch behavior: allow vertical page scroll but enable horizontal drag gestures */
+.card-scroller {
+  touch-action: pan-y;
+}
+
+.scroller-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+  opacity: 0; /* hidden until hover */
+}
+
+.scroller-wrapper:hover .scroller-nav {
+  opacity: 1;
+}
+
+.scroller-prev {
+  left: -10px;
+}
+
+.scroller-next {
+  right: -10px;
+}
+
+.scroller-nav:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+@media (max-width: 600px) {
+  .scroller-prev {
+    left: 0;
+  }
+  .scroller-next {
+    right: 0;
+  }
+}
+
+.scroller-nav:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+/* ensure headings stay fixed and don't shift when scroller moves */
+.scroller-wrapper + h2, .scroller-wrapper + p {
+  position: relative;
+}
+
+/* Prevent any horizontal page-level scroll that could show a bottom scrollbar */
+html, body {
+  overflow-x: hidden;
+}

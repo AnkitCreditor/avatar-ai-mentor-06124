@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
-import SessionInfo from "@/components/SessionInfo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Clock, CalendarDays, Video, Copy } from "lucide-react";
+import { Users, Clock, CalendarDays, Video, Copy, ChevronLeft, ChevronRight } from "lucide-react";
 import { loadSessions, SessionRecord } from "@/lib/sessionStorage";
 import { useToast } from "@/hooks/use-toast";
+import "./Index.css";
 
 const formatSchedule = (value?: string) => {
   if (!value) {
@@ -29,6 +29,12 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [sessions, setSessions] = useState<SessionRecord[]>(() => loadSessions());
+  const [liveCarouselPos, setLiveCarouselPos] = useState(0);
+  const [upcomingCarouselPos, setUpcomingCarouselPos] = useState(0);
+  const [completedCarouselPos, setCompletedCarouselPos] = useState(0);
+  const liveRef = useRef<HTMLDivElement | null>(null);
+  const upcomingRef = useRef<HTMLDivElement | null>(null);
+  const completedRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const refreshSessions = () => {
@@ -99,50 +105,58 @@ const Index = () => {
     const isJoinDisabled = session.status !== "Active";
 
     return (
-      <Card key={session.id} className="border border-border shadow-sm">
-        <CardHeader className="flex flex-row items-start justify-between gap-4">
-          <div>
-            <CardTitle className="text-xl text-foreground">{session.course}</CardTitle>
-            <p className="text-sm text-muted-foreground">{session.instructor}</p>
+      <Card key={session.id} className="border border-border shadow-sm hover:shadow-md transition-all duration-300 flex-shrink-0 carousel-card flex flex-col"
+        style={{ width: '340px', height: '260px' }}
+      >
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-base font-semibold text-foreground truncate">{session.course}</CardTitle>
+              <p className="text-xs text-muted-foreground truncate mt-1">{session.instructor}</p>
+            </div>
+            <Badge
+              variant={
+                session.status === "Active"
+                  ? "default"
+                  : session.status === "Scheduled"
+                    ? "secondary"
+                    : "outline"
+              }
+              className="flex-shrink-0 text-xs"
+            >
+              {session.status}
+            </Badge>
           </div>
-          <Badge
-            variant={
-              session.status === "Active"
-                ? "default"
-                : session.status === "Scheduled"
-                  ? "secondary"
-                  : "outline"
-            }
-          >
-            {session.status}
-          </Badge>
         </CardHeader>
-        <CardContent className="space-y-4 text-sm text-muted-foreground">
-          <div className="flex flex-wrap items-center gap-3">
-            <Users className="h-4 w-4 text-primary" />
-            <span>{session.students} learners enrolled</span>
-            <span>•</span>
-            <Clock className="h-4 w-4 text-primary" />
-            <span>{session.duration}</span>
+        <CardContent className="pb-1 space-y-5 flex-1 text-xs text-muted-foreground">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2">
+              <Users className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+              <span className="truncate">{session.students} learners</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+              <span className="truncate">{session.duration}</span>
+            </div>
           </div>
           {scheduledAt && (
-            <div className="flex items-center gap-3">
-              <CalendarDays className="h-4 w-4 text-primary" />
-              <span className="text-foreground">{scheduledAt}</span>
+            <div className="flex items-center gap-2 pt-1">
+              <CalendarDays className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+              <span className="truncate text-foreground text-xs">{scheduledAt}</span>
             </div>
           )}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-medium text-foreground">Meeting ID:</span>
-            <span className="font-mono text-xs sm:text-sm">{session.meetingId}</span>
+          <div className="flex items-center gap-1 pt-1 text-xs">
+            <span className="font-medium text-foreground">ID:</span>
+            <span className="font-mono text-xs text-muted-foreground truncate">{session.meetingId}</span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => handleJoinSession(session)} className="gap-2" disabled={isJoinDisabled}>
-              <Video className="h-4 w-4" />
-              Join Session
+          <div className="flex flex-col gap-2 pt-2">
+            <Button onClick={() => handleJoinSession(session)} size="sm" className="gap-1.5 text-xs h-8" disabled={isJoinDisabled}>
+              <Video className="h-3.5 w-3.5" />
+              Join
             </Button>
-            <Button variant="outline" onClick={() => copySessionLink(session.shareLink)} className="gap-2">
-              <Copy className="h-4 w-4" />
-              Copy Invite Link
+            <Button variant="outline" onClick={() => copySessionLink(session.shareLink)} size="sm" className="gap-1.5 text-xs h-8">
+              <Copy className="h-3.5 w-3.5" />
+              Copy Link
             </Button>
           </div>
         </CardContent>
@@ -150,9 +164,70 @@ const Index = () => {
     );
   };
 
+  const CARD_WIDTH = 340; // px - should match CSS
+  const GAP = 16; // px gap between items
+
+  const scrollBy = (container: HTMLDivElement | null, dir: number) => {
+    if (!container) return;
+    const amount = dir * (CARD_WIDTH + GAP);
+    // Get the max scrollable width
+    const maxScroll = container.scrollWidth - container.clientWidth;
+
+    // Only scroll if there's more content to scroll
+    if (container.scrollLeft + amount > maxScroll) {
+      container.scrollLeft = maxScroll;
+    } else if (container.scrollLeft + amount < 0) {
+      container.scrollLeft = 0;
+    } else {
+      container.scrollBy({ left: amount, behavior: "smooth" });
+    }
+  };
+
+  const renderEmblaCarousel = (items: SessionRecord[], ref?: React.RefObject<HTMLDivElement>) => {
+    if (items.length === 0) return null;
+
+    return (
+      <div className="scroller-wrapper group">
+        <button
+          className="scroller-nav scroller-prev opacity-0 group-hover:opacity-100"
+          aria-label="Previous"
+          onClick={() => scrollBy(ref?.current ?? null, -1)}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+
+        <div
+          ref={ref}
+          className="card-scroller"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") scrollBy(ref?.current ?? null, -1);
+            if (e.key === "ArrowRight") scrollBy(ref?.current ?? null, 1);
+          }}
+        >
+          {items.map((session) => (
+            <div key={session.id} className="card-scroller-item">
+              {renderSessionCard(session)}
+            </div>
+          ))}
+        </div>
+
+        <button
+          className="scroller-nav scroller-next opacity-0 group-hover:opacity-100"
+          aria-label="Next"
+          onClick={() => scrollBy(ref?.current ?? null, 1)}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar />
+      <div className="fixed left-0 top-0 h-full w-64">
+        <Sidebar />
+      </div>
 
       <main className="ml-64 flex-1 p-8">
         <div className="mx-auto max-w-7xl space-y-8">
@@ -171,12 +246,10 @@ const Index = () => {
                   <p className="text-sm text-muted-foreground">Sessions currently in progress.</p>
                 </div>
                 {liveSessions.length > 0 ? (
-                  <div className="space-y-4">
-                    {liveSessions.map((session) => renderSessionCard(session))}
-                  </div>
+                  renderEmblaCarousel(liveSessions)
                 ) : (
-                  <Card className="border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-                    No sessions are live right now. Check upcoming sessions or wait for an instructor to go live.
+                  <Card className="border border-dashed border-border bg-muted/40 p-8 text-sm text-muted-foreground empty-state-card text-center">
+                    <p>No sessions are live right now. Check upcoming sessions or wait for an instructor to go live.</p>
                   </Card>
                 )}
               </section>
@@ -187,20 +260,15 @@ const Index = () => {
                   <p className="text-sm text-muted-foreground">Join early to get your setup ready.</p>
                 </div>
                 {upcomingSessions.length > 0 ? (
-                  <div className="space-y-4">
-                    {upcomingSessions.map((session) => renderSessionCard(session))}
-                  </div>
+                  renderEmblaCarousel(upcomingSessions)
                 ) : (
-                  <Card className="border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-                    No upcoming sessions scheduled yet. Check back soon or contact your instructor.
+                  <Card className="border border-dashed border-border bg-muted/40 p-8 text-sm text-muted-foreground empty-state-card text-center">
+                    <p>No upcoming sessions scheduled yet. Check back soon or contact your instructor.</p>
                   </Card>
                 )}
               </section>
             </div>
 
-            <div className="space-y-6">
-              <SessionInfo />
-            </div>
           </div>
 
           <section className="space-y-4">
@@ -209,31 +277,10 @@ const Index = () => {
               <p className="text-sm text-muted-foreground">Catch up on classes you might have missed.</p>
             </div>
             {completedSessions.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {completedSessions.map((session) => (
-                  <Card key={session.id} className="border border-border">
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-4">
-                        <CardTitle className="text-lg text-foreground">{session.course}</CardTitle>
-                        <Badge variant="outline">Completed</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-primary" />
-                        <span>{session.students} learners attended</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-primary" />
-                        <span>{session.duration}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              renderEmblaCarousel(completedSessions)
             ) : (
-              <Card className="border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-                Completed sessions will appear here once your classes finish.
+              <Card className="border border-dashed border-border bg-muted/40 p-8 text-sm text-muted-foreground empty-state-card text-center">
+                <p>Completed sessions will appear here once your classes finish.</p>
               </Card>
             )}
           </section>
