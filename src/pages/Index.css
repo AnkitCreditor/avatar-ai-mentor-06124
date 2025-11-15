@@ -278,27 +278,6 @@
   flex-direction: column;
 }
 
-/* Index-aware horizontal slide on interaction
-   - The wrapper sets --slide-x based on item index
-   - Activated by hover, focus-within, :active, or JS-set data-interacting
-   - Duration: 300ms, timing: ease-in-out */
-.card-scroller-item[data-interacting="true"] .carousel-card,
-.card-scroller-item:active .carousel-card,
-.card-scroller-item:focus-within .carousel-card,
-.card-scroller-item:hover .carousel-card {
-  transform: translateX(var(--slide-x));
-  transition: transform 300ms ease-in-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card-scroller-item[data-interacting="true"] .carousel-card,
-  .card-scroller-item:active .carousel-card,
-  .card-scroller-item:focus-within .carousel-card,
-  .card-scroller-item:hover .carousel-card {
-    transition-duration: 0ms;
-  }
-}
-
 /* internal layout uses existing card component classes; no extra rules needed here */
 
 /* better touch behavior: allow vertical page scroll but enable horizontal drag gestures */
