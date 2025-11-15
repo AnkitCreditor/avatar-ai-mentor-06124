@@ -730,18 +730,58 @@ const SessionMeetingExperience = ({
     } else if (activeTab === "chatbot") {
       setChatbotMessages((prev) => [...prev, payload]);
 
-      setTimeout(() => {
+      const text = chatInput.trim();
+      const isWhoBuilt = /who\s+built|who\s+made|kisne\s+banaya|kisne\s+banya|kisne\s+banai/i.test(text);
+      if (isWhoBuilt) {
         setChatbotMessages((prev) => [
           ...prev,
           {
             id: `bot-${Date.now()}`,
-            sender: "AI Tutor",
-            message: "Great question! I'll break that down right after this section.",
+            sender: "Athena LMS",
+            message: "This chatbot is built by Athena LMS.",
             timestamp: formatTimestamp(),
             source: "bot",
           },
         ]);
-      }, 600);
+      } else {
+        const backend = (import.meta as any).env?.VITE_BACKEND_URL ?? "/api";
+        fetch(`${backend}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text }),
+        })
+          .then(async (res) => {
+            if (!res.ok) throw new Error("Failed to fetch chatbot response");
+            const data = await res.json();
+            const content =
+              data?.choices?.[0]?.message?.content ??
+              data?.data?.choices?.[0]?.message?.content ??
+              data?.output_text ??
+              "I'm here to help.";
+            setChatbotMessages((prev) => [
+              ...prev,
+              {
+                id: `bot-${Date.now()}`,
+                sender: "AI Tutor",
+                message: content,
+                timestamp: formatTimestamp(),
+                source: "bot",
+              },
+            ]);
+          })
+          .catch(() => {
+            setChatbotMessages((prev) => [
+              ...prev,
+              {
+                id: `bot-${Date.now()}`,
+                sender: "Athena LMS",
+                message: "Sorry, I couldn't connect to the tutor. Powered by Athena LMS.",
+                timestamp: formatTimestamp(),
+                source: "bot",
+              },
+            ]);
+          });
+      }
     }
 
     setChatInput("");

@@ -13,8 +13,6 @@ const Sidebar = () => {
     { id: "courses", label: "My Courses", icon: BookOpen },
     { id: "virtual-instructor", label: "Virtual Instructor", icon: Video },
     { id: "schedule", label: "Schedule", icon: Calendar },
-    { id: "students", label: "Students", icon: Users },
-    { id: "analytics", label: "Analytics", icon: BarChart },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -29,27 +27,29 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeItem === item.id;
-          return (
-            <Button
-              key={item.id}
-              variant={isActive ? "secondary" : "ghost"}
-              className={cn(
-                "w-full justify-start gap-3",
-                isActive && "bg-primary/10 text-primary hover:bg-primary/20"
-              )}
-              onClick={() => setActiveItem(item.id)}
-            >
-              <Icon className="h-5 w-5" />
-              {item.label}
-            </Button>
-          );
-        })}
-        
-        <div className="pt-4 mt-4 border-t border-border">
+      <nav className="flex flex-1 flex-col gap-4 p-4">
+        <div className="flex flex-col gap-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeItem === item.id;
+            return (
+              <Button
+                key={item.id}
+                variant={isActive ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start gap-3",
+                  isActive && "bg-primary/10 text-primary hover:bg-primary/20"
+                )}
+                onClick={() => setActiveItem(item.id)}
+              >
+                <Icon className="h-5 w-5" />
+                {item.label}
+              </Button>
+            );
+          })}
+        </div>
+
+        <div className="mt-auto rounded-xl border border-border bg-muted/40 p-2">
           <Button
             variant="outline"
             className="w-full justify-start gap-3"
