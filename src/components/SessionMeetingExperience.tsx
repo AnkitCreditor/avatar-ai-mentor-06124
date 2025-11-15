@@ -167,15 +167,13 @@ const SessionMeetingExperience = ({
     },
   ]);
 
-  const [chatbotMessages, setChatbotMessages] = useState<ChatMessage[]>([
-    {
-      id: "bot-1",
-      sender: "AI Tutor",
-      message: "Hi! Ask me anything about today's topic and I'll help you out.",
-      timestamp: "09:57",
-      source: "bot",
-    },
-  ]);
+  const [chatbotMessages, setChatbotMessages] = useState<ChatMessage[]>([{
+    id: `bot-${Date.now()}`,
+    sender: "AI Tutor",
+    message: "Hello! How can I help you today?",
+    timestamp: formatTimestamp(),
+    source: "bot",
+  }]);
 
   const [mediaError, setMediaError] = useState<string | null>(null);
   const [isRequestingMedia, setIsRequestingMedia] = useState(false);
@@ -222,10 +220,10 @@ const SessionMeetingExperience = ({
 
   const appliedBackgroundStyle = selectedBackground
     ? {
-        backgroundImage: `url(${selectedBackground})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }
+      backgroundImage: `url(${selectedBackground})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }
     : undefined;
   const shouldUseVirtualBackground = Boolean(selectedBackground);
 
@@ -752,11 +750,10 @@ const SessionMeetingExperience = ({
       <div className="relative h-full w-full">
         <video
           ref={previewVideoRef}
-          className={`${
-            shouldUseVirtualBackground && !virtualBackgroundError && !backgroundTimeoutExceeded
+          className={`${shouldUseVirtualBackground && !virtualBackgroundError && !backgroundTimeoutExceeded
               ? "hidden"
               : "h-full w-full object-cover"
-          }`}
+            }`}
           muted
           playsInline
           autoPlay
@@ -813,16 +810,15 @@ const SessionMeetingExperience = ({
                     key={option.id}
                     type="button"
                     onClick={() => handleBackgroundSelection(option.image)}
-                    className={`relative flex h-20 items-end overflow-hidden rounded-lg border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                      isSelected ? "border-primary ring-2 ring-primary/40" : "border-border"
-                    }`}
+                    className={`relative flex h-20 items-end overflow-hidden rounded-lg border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${isSelected ? "border-primary ring-2 ring-primary/40" : "border-border"
+                      }`}
                     style={
                       option.image
                         ? {
-                            backgroundImage: `url(${option.thumbnail ?? option.image})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                          }
+                          backgroundImage: `url(${option.thumbnail ?? option.image})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }
                         : { background: "linear-gradient(135deg,#f8fafc,#e2e8f0)" }
                     }
                   >
@@ -842,9 +838,8 @@ const SessionMeetingExperience = ({
                   key="custom"
                   type="button"
                   onClick={() => handleBackgroundSelection(customBackground)}
-                  className={`relative flex h-20 items-end overflow-hidden rounded-lg border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                    selectedBackground === customBackground ? "border-primary ring-2 ring-primary/40" : "border-border"
-                  }`}
+                  className={`relative flex h-20 items-end overflow-hidden rounded-lg border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${selectedBackground === customBackground ? "border-primary ring-2 ring-primary/40" : "border-border"
+                    }`}
                   style={{
                     backgroundImage: `url(${customBackground})`,
                     backgroundSize: "cover",
@@ -1008,13 +1003,13 @@ const SessionMeetingExperience = ({
                   </span>
                   Live
                 </div>
-                
+
               </div>
 
               <div >
-                
-                
-              
+
+
+
               </div>
             </div>
 
@@ -1044,9 +1039,8 @@ const SessionMeetingExperience = ({
               <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-2 text-xs">
                 <Button
                   variant="secondary"
-                  className={`flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-white hover:bg-white/20 ${
-                    activePanel === "chat" && showModal ? "!bg-white/25" : ""
-                  }`}
+                  className={`flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-white hover:bg-white/20 ${activePanel === "chat" && showModal ? "!bg-white/25" : ""
+                    }`}
                   onClick={() =>
                     showModal && activePanel === "chat" ? closePanel() : openPanel("chat")
                   }
@@ -1076,9 +1070,8 @@ const SessionMeetingExperience = ({
                 <Button
                   variant="secondary"
                   size="icon"
-                  className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${
-                    activePanel === "info" && showModal ? "!bg-white/30" : ""
-                  }`}
+                  className={`h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 ${activePanel === "info" && showModal ? "!bg-white/30" : ""
+                    }`}
                   onClick={() =>
                     showModal && activePanel === "info" ? closePanel() : openPanel("info")
                   }
@@ -1154,18 +1147,17 @@ const SessionMeetingExperience = ({
 
                   <div className="mt-4 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
                     <TabsContent value="session-chat" className="h-full">
-                      <ScrollArea className="h-full px-4 py-4">
+                      <ScrollArea className="h-full px-4 py-4 overflow-y-auto">
                         <div className="flex h-full flex-col-reverse gap-4">
                           {[...sessionChat].map((message) => (
                             <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
                               <div
-                                className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                                  message.source === "participant"
+                                className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${message.source === "participant"
                                     ? "bg-primary/90 text-primary-foreground shadow-md"
                                     : message.source === "instructor"
-                                    ? "bg-neutral-800 text-white shadow-sm"
-                                    : "bg-neutral-700 text-white"
-                                }`}
+                                      ? "bg-neutral-800 text-white shadow-sm"
+                                      : "bg-neutral-700 text-white"
+                                  }`}
                               >
                                 <p className="font-medium">{message.sender}</p>
                                 <p>{message.message}</p>
@@ -1178,16 +1170,15 @@ const SessionMeetingExperience = ({
                     </TabsContent>
 
                     <TabsContent value="chatbot" className="h-full">
-                      <ScrollArea className="h-full px-1 py-1">
+                      <ScrollArea className="h-full px-1 py-1 overflow-y-auto">
                         <div className="flex h-full flex-col-reverse gap-4">
                           {[...chatbotMessages].map((message) => (
                             <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
                               <div
-                                className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                                  message.source === "participant"
+                                className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${message.source === "participant"
                                     ? "bg-primary/90 text-primary-foreground shadow-md"
                                     : "bg-neutral-700 text-white"
-                                }`}
+                                  }`}
                               >
                                 <p className="flex items-center gap-2 font-medium">
                                   {message.source === "bot" && <Bot className="h-3 w-3" />}
@@ -1203,7 +1194,7 @@ const SessionMeetingExperience = ({
                     </TabsContent>
 
                     <TabsContent value="resources" className="h-full">
-                      <div className="flex h-full flex-col gap-3 px-5 py-4 text-sm">
+                      <div className="flex h-full flex-col gap-3 px-5 py-4 text-sm overflow-y-auto">
                         <div>
                           <p className="font-medium text-white">Lesson Materials</p>
                           <p className="text-neutral-400">Slides, worksheets, and recordings will appear here.</p>
@@ -1217,7 +1208,7 @@ const SessionMeetingExperience = ({
                     </TabsContent>
                   </div>
 
-                  <div className="mt-4 flex-shrink-0 rounded-2xl border border-white/10 bg-neutral-900 px-4 py-4 shadow-lg">
+                  <div className="sticky bottom-0 bg-neutral-900 mt-4 flex-shrink-0 rounded-2xl border border-white/10 px-4 py-4 shadow-lg">
                     <form onSubmit={handleSendMessage} className="flex flex-col gap-2">
                       <Textarea
                         placeholder={
