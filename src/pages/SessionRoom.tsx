@@ -18,14 +18,12 @@ const SessionRoom = () => {
   }, [session?.shareLink, sessionId]);
 
   return (
-    <div className="min-h-screen bg-muted ">
-      <div className="max-w-7xl mx-auto flex-col gap-0">
-        <SessionMeetingExperience
-          sessionId={sessionId}
-          courseTitle={session?.course ?? "Virtual Instructor Session"}
-          shareLink={shareLink}
-        />
-      </div>
+    <div className="h-screen w-screen overflow-hidden p-0 m-0">
+      <SessionMeetingExperience
+        sessionId={sessionId}
+        courseTitle={session?.course ?? "Virtual Instructor Session"}
+        shareLink={shareLink}
+      />
     </div>
   );
 };
