@@ -1421,7 +1421,7 @@ const SessionMeetingExperience = ({
                       title="Resources"
                     >
                       <BookOpen className="h-5 w-5" />
-                      </Button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -1441,22 +1441,15 @@ const SessionMeetingExperience = ({
                   <div>
                     <h3 className="text-base font-semibold">
                       {activePanel === "chat"
-                        ? "Collaboration"
-                        : activePanel === "participants"
-                        ? "Participants"
-                        : activePanel === "resources"
-                        ? "Resources"
-                        : "Meeting info"}
+                      }
                     </h3>
-                  <p className="text-xs text-neutral-400">
-                    {activePanel === "chat"
-                      ? "AI Tutor"
-                      : activePanel === "participants"
-                        ? `${participantCount} participants in this meeting`
-                        : activePanel === "resources"
-                          ? "Lesson materials and links"
-                          : "Share details with participants"}
-                  </p>
+                    <p className="text-xs text-neutral-400">
+                      {activePanel === "chat"
+                        ? "AI Tutor"
+                        : activePanel === "participants"
+                          ? `${participantCount} participants in this meeting`
+                        }
+                    </p>
                   </div>
                   <Button size="sm" variant="ghost" className="rounded-full px-3 text-neutral-300 hover:bg-white/10" onClick={closePanel}>
                     Close
@@ -1507,55 +1500,54 @@ const SessionMeetingExperience = ({
                 ) : activePanel === "chat" ? (
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4">
 
-                      <div className="mt-0 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
-                        
+                    <div className="mt-0 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
 
-                        <TabsContent value="chatbot" className="h-full">
-                          <ScrollArea ref={chatbotScrollAreaRef as any} className="h-full px-4 py-4 overflow-y-auto">
-                            <div className="flex h-full flex-col gap-4">
-                              {chatbotMessages.map((message) => (
-                                <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
-                                  <div
-                                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                                      message.source === "participant"
-                                        ? "bg-primary/90 text-primary-foreground shadow-md"
-                                        : "bg-neutral-700 text-white"
+
+                      <TabsContent value="chatbot" className="h-full">
+                        <ScrollArea ref={chatbotScrollAreaRef as any} className="h-full px-4 py-4 overflow-y-auto">
+                          <div className="flex h-full flex-col gap-4">
+                            {chatbotMessages.map((message) => (
+                              <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
+                                <div
+                                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${message.source === "participant"
+                                    ? "bg-primary/90 text-primary-foreground shadow-md"
+                                    : "bg-neutral-700 text-white"
                                     }`}
-                                  >
-                                    <p className="flex items-center gap-2 font-medium">
-                                      {message.source === "bot" && <Bot className="h-3 w-3" />}
-                                      {message.sender}
-                                    </p>
-                                    <p>{message.message}</p>
-                                    <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
-                                  </div>
+                                >
+                                  <p className="flex items-center gap-2 font-medium">
+                                    {message.source === "bot" && <Bot className="h-3 w-3" />}
+                                    {message.sender}
+                                  </p>
+                                  <p>{message.message}</p>
+                                  <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
                                 </div>
-                              ))}
-                            </div>
-                          </ScrollArea>
-                        </TabsContent>
-
-                        
-                      </div>
-
-                      <div className="sticky bottom-0 bg-neutral-900 mt-4 flex-shrink-0 rounded-2xl border border-white/10 px-4 py-4 shadow-lg">
-                        <form onSubmit={handleSendMessage} className="flex flex-col gap-2">
-                          <Textarea
-                            placeholder={activeTab === "chatbot" ? "Ask the AI tutor a quick question..." : "Share an update or ask the group something..."}
-                            value={chatInput}
-                            onChange={(e) => setChatInput(e.target.value)}
-                            rows={3}
-                            className="h-20 resize-none overflow-y-auto bg-neutral-950/70 text-white focus-visible:ring-0 focus-visible:ring-offset-0" />
-                          <div className="flex items-center justify-between text-xs text-neutral-400">
-                            <span>{displayName || "You"} {isMicOn ? "(mic on)" : "(mic muted)"}</span>
-                            <Button type="submit" size="sm" className="gap-2 rounded-full bg-primary px-4 text-white hover:bg-primary/90">
-                              <MessageSquare className="h-4 w-4" />
-                              Send
-                            </Button>
+                              </div>
+                            ))}
                           </div>
-                        </form>
-                      </div>
-                    </Tabs>
+                        </ScrollArea>
+                      </TabsContent>
+
+
+                    </div>
+
+                    <div className="sticky bottom-0 bg-neutral-900 mt-4 flex-shrink-0 rounded-2xl border border-white/10 px-4 py-4 shadow-lg">
+                      <form onSubmit={handleSendMessage} className="flex flex-col gap-2">
+                        <Textarea
+                          placeholder={activeTab === "chatbot" ? "Ask the AI tutor a quick question..." : "Share an update or ask the group something..."}
+                          value={chatInput}
+                          onChange={(e) => setChatInput(e.target.value)}
+                          rows={3}
+                          className="h-20 resize-none overflow-y-auto bg-neutral-950/70 text-white focus-visible:ring-0 focus-visible:ring-offset-0" />
+                        <div className="flex items-center justify-between text-xs text-neutral-400">
+                          <span>{displayName || "You"} {isMicOn ? "(mic on)" : "(mic muted)"}</span>
+                          <Button type="submit" size="sm" className="gap-2 rounded-full bg-primary px-4 text-white hover:bg-primary/90">
+                            <MessageSquare className="h-4 w-4" />
+                            Send
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                  </Tabs>
                 ) : activePanel === "resources" ? (
                   <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
                     <div className="mt-0 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
@@ -1578,44 +1570,44 @@ const SessionMeetingExperience = ({
                   <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
                     <div className="rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
                       <h4 className="text-base font-semibold">Meeting details</h4>
-                  <p className="mt-2 text-xs text-neutral-400">Share these details with anyone who needs to join.</p>
-                  <div className="mt-4 space-y-2 text-xs">
-                    <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
-                      <span className="font-semibold text-neutral-100">Course</span>
-                      <span className="text-neutral-300">{courseTitle}</span>
+                      <p className="mt-2 text-xs text-neutral-400">Share these details with anyone who needs to join.</p>
+                      <div className="mt-4 space-y-2 text-xs">
+                        <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                          <span className="font-semibold text-neutral-100">Course</span>
+                          <span className="text-neutral-300">{courseTitle}</span>
+                        </div>
+                        <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                          <span className="font-semibold text-neutral-100">Elapsed</span>
+                          <span className="text-neutral-300">00:12</span>
+                        </div>
+                        <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
+                          <span className="font-semibold text-neutral-100">Meeting ID</span>
+                          <span className="text-neutral-300">{sessionId ?? "Shared link"}</span>
+                        </div>
+                      </div>
+                      <Button
+                        variant="secondary"
+                        className="mt-4 w-full justify-center rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
+                        onClick={handleCopyLink}
+                      >
+                        <Share2 className="mr-2 h-4 w-4" />
+                        Copy invite link
+                      </Button>
                     </div>
-                    <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
-                      <span className="font-semibold text-neutral-100">Elapsed</span>
-                      <span className="text-neutral-300">00:12</span>
-                    </div>
-                    <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
-                      <span className="font-semibold text-neutral-100">Meeting ID</span>
-                      <span className="text-neutral-300">{sessionId ?? "Shared link"}</span>
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
+                      <h4 className="text-base font-semibold">Participants overview</h4>
+                      <p className="mt-2 text-xs text-neutral-400">
+                        {participantCount}+ learners connected. Use the chat to collaborate in real-time.
+                      </p>
                     </div>
                   </div>
-                  <Button
-                    variant="secondary"
-                    className="mt-4 w-full justify-center rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
-                    onClick={handleCopyLink}
-                  >
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Copy invite link
-                  </Button>
-                </div>
-                <div className="mt-4 rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
-                  <h4 className="text-base font-semibold">Participants overview</h4>
-                  <p className="mt-2 text-xs text-neutral-400">
-                    {participantCount}+ learners connected. Use the chat to collaborate in real-time.
-                  </p>
-                </div>
-              </div>
-            )}
-          </motion.aside>
-        ) : null}
-        </AnimatePresence>
-      </main>
-    </div>
-    {backgroundDialog}
+                )}
+              </motion.aside>
+            ) : null}
+          </AnimatePresence>
+        </main>
+      </div>
+      {backgroundDialog}
     </>
   );
 };
