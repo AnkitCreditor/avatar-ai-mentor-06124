@@ -31,6 +31,7 @@ import {
   ThumbsUp,
   PartyPopper,
   Sparkles,
+  BookOpen,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getBaseOrigin } from "@/lib/sessionStorage";
@@ -1406,6 +1407,18 @@ const SessionMeetingExperience = ({
                     >
                       <MessageSquare className="h-5 w-5" />
                     </Button>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
+                      onClick={() => {
+                        if (!(showModal && activePanel === "chat")) openPanel("chat");
+                        setActiveTab("resources");
+                      }}
+                      title="Resources"
+                    >
+                      <BookOpen className="h-5 w-5" />
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -1482,10 +1495,7 @@ const SessionMeetingExperience = ({
                   </div>
                 ) : activePanel === "chat" ? (
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4">
-                      <TabsList className="flex-shrink-0 grid grid-cols-3 rounded-full bg-white/10 p-1 text-xs">
-                        <TabsTrigger value="session-chat" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
-                          Session
-                        </TabsTrigger>
+                      <TabsList className="flex-shrink-0 grid grid-cols-2 rounded-full bg-white/10 p-1 text-xs">
                         <TabsTrigger value="chatbot" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
                           AI Tutor
                         </TabsTrigger>
@@ -1495,29 +1505,7 @@ const SessionMeetingExperience = ({
                       </TabsList>
 
                       <div className="mt-4 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
-                        <TabsContent value="session-chat" className="h-full">
-                          <ScrollArea ref={sessionScrollAreaRef as any} className="h-full px-4 py-4 overflow-y-auto">
-                            <div className="flex h-full flex-col gap-4">
-                              {sessionChat.map((message) => (
-                                <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
-                                  <div
-                                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                                      message.source === "participant"
-                                        ? "bg-primary/90 text-primary-foreground shadow-md"
-                                        : message.source === "instructor"
-                                        ? "bg-neutral-800 text-white shadow-sm"
-                                        : "bg-neutral-700 text-white"
-                                    }`}
-                                  >
-                                    <p className="font-medium">{message.sender}</p>
-                                    <p>{message.message}</p>
-                                    <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </ScrollArea>
-                        </TabsContent>
+                        
 
                         <TabsContent value="chatbot" className="h-full">
                           <ScrollArea ref={chatbotScrollAreaRef as any} className="h-full px-4 py-4 overflow-y-auto">
