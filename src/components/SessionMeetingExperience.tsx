@@ -1448,15 +1448,15 @@ const SessionMeetingExperience = ({
                         ? "Resources"
                         : "Meeting info"}
                     </h3>
-                    <p className="text-xs text-neutral-400">
-                      {activePanel === "chat"
-                        ? "Chat, AI tutor, and resources"
-                        : activePanel === "participants"
+                  <p className="text-xs text-neutral-400">
+                    {activePanel === "chat"
+                      ? "AI Tutor"
+                      : activePanel === "participants"
                         ? `${participantCount} participants in this meeting`
                         : activePanel === "resources"
-                        ? "Lesson materials and links"
-                        : "Share details with participants"}
-                    </p>
+                          ? "Lesson materials and links"
+                          : "Share details with participants"}
+                  </p>
                   </div>
                   <Button size="sm" variant="ghost" className="rounded-full px-3 text-neutral-300 hover:bg-white/10" onClick={closePanel}>
                     Close
@@ -1506,13 +1506,8 @@ const SessionMeetingExperience = ({
                   </div>
                 ) : activePanel === "chat" ? (
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4">
-                      <TabsList className="flex-shrink-0 grid grid-cols-1 rounded-full bg-white/10 p-1 text-xs">
-                        <TabsTrigger value="chatbot" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
-                          AI Tutor
-                        </TabsTrigger>
-                      </TabsList>
 
-                      <div className="mt-4 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
+                      <div className="mt-0 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
                         
 
                         <TabsContent value="chatbot" className="h-full">
