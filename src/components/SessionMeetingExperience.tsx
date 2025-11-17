@@ -1412,13 +1412,16 @@ const SessionMeetingExperience = ({
                       size="icon"
                       className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20"
                       onClick={() => {
-                        if (!(showModal && activePanel === "chat")) openPanel("chat");
-                        setActiveTab("resources");
+                        if (showModal && activePanel === "resources") {
+                          closePanel();
+                        } else {
+                          openPanel("resources");
+                        }
                       }}
                       title="Resources"
                     >
                       <BookOpen className="h-5 w-5" />
-                    </Button>
+                      </Button>
                   </div>
                 </div>
               </div>
@@ -1437,14 +1440,22 @@ const SessionMeetingExperience = ({
                 <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
                   <div>
                     <h3 className="text-base font-semibold">
-                      {activePanel === "chat" ? "Collaboration" : activePanel === "participants" ? "Participants" : "Meeting info"}
+                      {activePanel === "chat"
+                        ? "Collaboration"
+                        : activePanel === "participants"
+                        ? "Participants"
+                        : activePanel === "resources"
+                        ? "Resources"
+                        : "Meeting info"}
                     </h3>
                     <p className="text-xs text-neutral-400">
                       {activePanel === "chat"
                         ? "Chat, AI tutor, and resources"
                         : activePanel === "participants"
-                          ? `${participantCount} participants in this meeting`
-                          : "Share details with participants"}
+                        ? `${participantCount} participants in this meeting`
+                        : activePanel === "resources"
+                        ? "Lesson materials and links"
+                        : "Share details with participants"}
                     </p>
                   </div>
                   <Button size="sm" variant="ghost" className="rounded-full px-3 text-neutral-300 hover:bg-white/10" onClick={closePanel}>
@@ -1495,12 +1506,9 @@ const SessionMeetingExperience = ({
                   </div>
                 ) : activePanel === "chat" ? (
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4">
-                      <TabsList className="flex-shrink-0 grid grid-cols-2 rounded-full bg-white/10 p-1 text-xs">
+                      <TabsList className="flex-shrink-0 grid grid-cols-1 rounded-full bg-white/10 p-1 text-xs">
                         <TabsTrigger value="chatbot" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
                           AI Tutor
-                        </TabsTrigger>
-                        <TabsTrigger value="resources" className="rounded-full data-[state=active]:bg-white data-[state=active]:text-neutral-900">
-                          Resources
                         </TabsTrigger>
                       </TabsList>
 
@@ -1532,19 +1540,7 @@ const SessionMeetingExperience = ({
                           </ScrollArea>
                         </TabsContent>
 
-                        <TabsContent value="resources" className="h-full">
-                          <div className="flex h-full flex-col gap-3 px-5 py-4 text-sm overflow-y-auto">
-                            <div>
-                              <p className="font-medium text-white">Lesson Materials</p>
-                              <p className="text-neutral-400">Slides, worksheets, and recordings will appear here.</p>
-                            </div>
-                            <ul className="list-inside list-disc space-y-1 text-neutral-400">
-                              <li>Interactive whiteboard snapshots</li>
-                              <li>Recommended follow-up practice</li>
-                              <li>Session transcript (auto-generated)</li>
-                            </ul>
-                          </div>
-                        </TabsContent>
+                        
                       </div>
 
                       <div className="sticky bottom-0 bg-neutral-900 mt-4 flex-shrink-0 rounded-2xl border border-white/10 px-4 py-4 shadow-lg">
@@ -1565,10 +1561,28 @@ const SessionMeetingExperience = ({
                         </form>
                       </div>
                     </Tabs>
-            ) : (
-              <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
-                <div className="rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
-                  <h4 className="text-base font-semibold">Meeting details</h4>
+                ) : activePanel === "resources" ? (
+                  <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
+                    <div className="mt-0 flex-1 min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-inner">
+                      <ScrollArea className="h-full px-5 py-4">
+                        <div className="flex h-full flex-col gap-3 text-sm">
+                          <div>
+                            <p className="font-medium text-white">Lesson Materials</p>
+                            <p className="text-neutral-400">Slides, worksheets, and recordings will appear here.</p>
+                          </div>
+                          <ul className="list-inside list-disc space-y-1 text-neutral-400">
+                            <li>Interactive whiteboard snapshots</li>
+                            <li>Recommended follow-up practice</li>
+                            <li>Session transcript (auto-generated)</li>
+                          </ul>
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex h-[calc(100%-4.5rem)] flex-col overflow-hidden px-5 py-4 text-sm text-neutral-100">
+                    <div className="rounded-2xl border border-white/10 bg-neutral-900 px-5 py-4 shadow-inner">
+                      <h4 className="text-base font-semibold">Meeting details</h4>
                   <p className="mt-2 text-xs text-neutral-400">Share these details with anyone who needs to join.</p>
                   <div className="mt-4 space-y-2 text-xs">
                     <div className="flex items-center justify-between rounded-2xl bg-neutral-800/80 px-4 py-3">
