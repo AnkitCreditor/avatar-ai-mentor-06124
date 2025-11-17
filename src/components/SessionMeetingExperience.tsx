@@ -1448,7 +1448,9 @@ const SessionMeetingExperience = ({
                         ? "AI Tutor"
                         : activePanel === "participants"
                           ? `${participantCount} participants in this meeting`
-                        }
+                          : activePanel === "resources"
+                            ? "Lesson materials and links"
+                            : "Share details with participants"}
                     </p>
                   </div>
                   <Button size="sm" variant="ghost" className="rounded-full px-3 text-neutral-300 hover:bg-white/10" onClick={closePanel}>
