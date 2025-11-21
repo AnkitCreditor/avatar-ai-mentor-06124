@@ -300,15 +300,15 @@ const ManageSessions = () => {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 pt-16 lg:pt-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Manage Virtual Instructor Sessions</h1>
-          <p className="text-muted-foreground">Create and control AI instructor sessions</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Manage Virtual Instructor Sessions</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Create and control AI instructor sessions</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 w-full sm:w-auto">
               <Plus className="h-4 w-4" />
               Create New Session
             </Button>
@@ -703,44 +703,54 @@ const ManageSessions = () => {
         <CardContent>
           <div className="space-y-4">
             {sessions.map((session) => (
-              <div key={session.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
-                <div className="space-y-1">
-                  <h3 className="font-semibold text-foreground">{session.course}</h3>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div key={session.id} className="flex flex-col lg:flex-row lg:items-center lg:justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors gap-4">
+                <div className="space-y-2 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-semibold text-foreground">{session.course}</h3>
+                    <Badge 
+                      className="lg:hidden flex-shrink-0" 
+                      variant={session.status === "Active" ? "default" : session.status === "Scheduled" ? "secondary" : "outline"}
+                    >
+                      {session.status}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     <span>{session.instructor}</span>
-                    <span>•</span>
+                    <span className="hidden sm:inline">•</span>
                     <span>{session.students} students</span>
-                    <span>•</span>
+                    <span className="hidden sm:inline">•</span>
                     <span>{session.duration}</span>
                   </div>
                   {session.config?.schedule && typeof session.config.schedule === 'string' && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
                       <span className="font-medium text-foreground">Scheduled:</span>
                       <span>{new Date(session.config.schedule).toLocaleString()}</span>
                       {session.config?.duration && typeof session.config.duration === 'string' && (
                         <>
-                          <span>•</span>
+                          <span className="hidden sm:inline">•</span>
                           <span>{session.config.duration} minutes</span>
                         </>
                       )}
                     </div>
                   )}
-                  <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 text-xs sm:text-sm">
                     <span className="font-medium text-foreground">Meeting ID:</span>
-                    <span className="font-mono text-xs sm:text-sm">{session.meetingId}</span>
+                    <span className="font-mono text-xs break-all">{session.meetingId}</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 pt-2">
                     <Button
                       size="sm"
                       variant="outline"
-                      className="gap-2"
+                      className="gap-2 w-full sm:w-auto"
                       onClick={() => copySessionLink(session.shareLink)}
                     >
                       <Copy className="h-4 w-4" />
-                      Copy Link
+                      <span className="sm:inline">Copy Link</span>
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="gap-2"
+                      className="gap-2 w-full sm:w-auto"
                       onClick={() => {
                         if (typeof window !== "undefined") {
                           window.open(session.shareLink, "_blank", "noopener,noreferrer");
@@ -748,15 +758,18 @@ const ManageSessions = () => {
                       }}
                     >
                       <Share2 className="h-4 w-4" />
-                      Open Room
+                      <span className="sm:inline">Open Room</span>
                     </Button>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant={session.status === "Active" ? "default" : session.status === "Scheduled" ? "secondary" : "outline"}>
+                <div className="flex flex-row lg:flex-col items-center justify-between lg:justify-start gap-3">
+                  <Badge 
+                    className="hidden lg:flex" 
+                    variant={session.status === "Active" ? "default" : session.status === "Scheduled" ? "secondary" : "outline"}
+                  >
                     {session.status}
                   </Badge>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     {session.status === "Active" && (
                       <Button size="sm" variant="outline" onClick={() => updateSessionStatus(session.id, "Scheduled")}>
                         <Pause className="h-4 w-4" />

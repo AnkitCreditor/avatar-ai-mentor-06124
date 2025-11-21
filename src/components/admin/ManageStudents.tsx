@@ -14,13 +14,13 @@ const ManageStudents = () => {
   ]);
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 pt-16 lg:pt-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Manage Students</h1>
-          <p className="text-muted-foreground">View and manage student enrollments</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Manage Students</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">View and manage student enrollments</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2 w-full sm:w-auto">
           <UserPlus className="h-4 w-4" />
           Add Student
         </Button>
@@ -38,7 +38,7 @@ const ManageStudents = () => {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-foreground">247</div>
@@ -72,17 +72,17 @@ const ManageStudents = () => {
         <CardContent>
           <div className="space-y-3">
             {students.map((student) => (
-              <div key={student.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+              <div key={student.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold flex-shrink-0">
                     {student.name.split(' ').map(n => n[0]).join('')}
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-foreground">{student.name}</h3>
-                    <p className="text-sm text-muted-foreground">{student.email}</p>
+                    <p className="text-sm text-muted-foreground truncate">{student.email}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-6">
+                <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                   <div className="text-center">
                     <div className="text-sm font-semibold text-foreground">{student.courses}</div>
                     <div className="text-xs text-muted-foreground">Courses</div>
@@ -94,7 +94,7 @@ const ManageStudents = () => {
                   <Badge variant={student.attendance >= 90 ? "default" : "secondary"}>
                     {student.attendance}% Attendance
                   </Badge>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 ml-auto sm:ml-0">
                     <Button size="sm" variant="outline">
                       <Mail className="h-4 w-4" />
                     </Button>
