@@ -133,7 +133,7 @@ const SessionMeetingExperience = ({
   const [isMicOn, setIsMicOn] = useState(false); // Muted by default
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [showCaptions, setShowCaptions] = useState(false);
-  const [activeTab, setActiveTab] = useState("session-chat");
+  const [activeTab, setActiveTab] = useState("chatbot");
   const [chatInput, setChatInput] = useState("");
   const [captionIndex, setCaptionIndex] = useState(0);
   const [selectedBackground, setSelectedBackground] = useState<string | null>(null);
@@ -144,7 +144,7 @@ const SessionMeetingExperience = ({
   const [backgroundTimeoutExceeded, setBackgroundTimeoutExceeded] = useState(false);
   const [customBackground, setCustomBackground] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [activePanel, setActivePanel] = useState<"chat" | "info" | "participants" | null>(null);
+  const [activePanel, setActivePanel] = useState<"chat" | "info" | "participants" | "resources" | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
@@ -519,7 +519,7 @@ const SessionMeetingExperience = ({
     }
   };
 
-  const openPanel = (panel: "chat" | "info" | "participants") => {
+  const openPanel = (panel: "chat" | "info" | "participants" | "resources") => {
     setActivePanel(panel);
     setShowModal(true);
   };
@@ -867,8 +867,8 @@ const SessionMeetingExperience = ({
             style={{ transform: 'scaleX(-1)' }}
           />
         ) : (
-          <canvas 
-            ref={previewCanvasRef} 
+          <canvas
+            ref={previewCanvasRef}
             className="h-full w-full object-cover"
             style={{ transform: 'scaleX(-1)' }}
           />
@@ -1525,6 +1525,28 @@ const SessionMeetingExperience = ({
                                     {message.source === "bot" && <Bot className="h-3 w-3" />}
                                     {message.sender}
                                   </p>
+                                  <p>{message.message}</p>
+                                  <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </TabsContent>
+
+
+                      <TabsContent value="session-chat" className="h-full">
+                        <ScrollArea ref={sessionScrollAreaRef as any} className="h-full px-4 py-4 overflow-y-auto">
+                          <div className="flex h-full flex-col gap-4">
+                            {sessionChat.map((message) => (
+                              <div key={message.id} className={`flex ${message.source === "participant" ? "justify-end" : "justify-start"}`}>
+                                <div
+                                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${message.source === "participant"
+                                    ? "bg-primary/90 text-primary-foreground shadow-md"
+                                    : "bg-neutral-700 text-white"
+                                    }`}
+                                >
+                                  <p className="font-medium">{message.sender}</p>
                                   <p>{message.message}</p>
                                   <p className="mt-1 text-[10px] uppercase tracking-wide text-white/70">{message.timestamp}</p>
                                 </div>
